@@ -9,6 +9,7 @@ desktop.ini
 *.log
 *.tmp
 *.temp
+.tmp-homepage.html
 
 # Node / frontend tooling
 node_modules/

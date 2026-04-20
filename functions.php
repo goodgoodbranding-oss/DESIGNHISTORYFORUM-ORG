@@ -40,5 +40,17 @@ function dhf_kadence_child_enqueue_styles() {
 		array( 'kadence-parent-style', 'dhf-google-fonts' ),
 		file_exists( $child_css_abs ) ? filemtime( $child_css_abs ) : $theme->get( 'Version' )
 	);
+
+	if ( is_front_page() ) {
+		wp_enqueue_script(
+			'dhf-homepage-cards',
+			get_stylesheet_directory_uri() . '/assets/js/homepage-cards.js',
+			array(),
+			file_exists( get_stylesheet_directory() . '/assets/js/homepage-cards.js' )
+				? filemtime( get_stylesheet_directory() . '/assets/js/homepage-cards.js' )
+				: $theme->get( 'Version' ),
+			true
+		);
+	}
 }
 add_action( 'wp_enqueue_scripts', 'dhf_kadence_child_enqueue_styles' );
