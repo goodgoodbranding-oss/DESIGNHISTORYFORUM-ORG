@@ -1,0 +1,148 @@
+/*
+ * Main custom CSS for the Kadence Child theme.
+ * This file holds theme-level design tokens and homepage-ready base styles.
+ */
+
+:root {
+	--dhf-font-display: "Bricolage Grotesque", sans-serif;
+	--dhf-font-body: "Inter", sans-serif;
+	--dhf-color-accent: #ff760a;
+	--dhf-color-accent-soft: #ffe7d4;
+	--dhf-color-text: #4a4a47;
+	--dhf-color-heading: #2d3748;
+	--dhf-color-muted: #4a5568;
+	--dhf-color-border: #e3e3e3;
+	--dhf-color-surface: #ededed;
+	--dhf-color-paper: #ffffff;
+	--dhf-content-width: min(1200px, calc(100vw - 48px));
+	--dhf-shadow-soft: 0 18px 45px rgba(45, 55, 72, 0.08);
+	--dhf-radius-card: 24px;
+	--dhf-transition: 220ms ease;
+}
+
+body {
+	color: var(--dhf-color-text);
+	font-family: var(--dhf-font-body);
+	background: var(--dhf-color-paper);
+	font-size: 18px;
+	line-height: 1.7;
+	text-rendering: optimizeLegibility;
+}
+
+a {
+	color: var(--dhf-color-accent);
+	text-decoration-thickness: 0.08em;
+	text-underline-offset: 0.12em;
+	transition: color var(--dhf-transition);
+}
+
+a:hover,
+a:focus {
+	color: var(--dhf-color-heading);
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+.entry-title,
+.wp-block-post-title,
+.site-title,
+.site-description {
+	color: var(--dhf-color-heading);
+	font-family: var(--dhf-font-display);
+	font-style: normal;
+	font-weight: 700;
+	letter-spacing: -0.03em;
+	line-height: 1.08;
+	text-wrap: balance;
+}
+
+h1,
+.wp-block-post-title,
+.entry-title {
+	font-size: clamp(2.6rem, 4vw, 4.75rem);
+}
+
+h2 {
+	font-size: clamp(2.1rem, 3vw, 3.4rem);
+}
+
+h3 {
+	font-size: clamp(1.7rem, 2.2vw, 2.5rem);
+}
+
+h4 {
+	font-size: clamp(1.35rem, 1.8vw, 2rem);
+}
+
+h5 {
+	font-size: clamp(1.15rem, 1.6vw, 1.5rem);
+}
+
+h6 {
+	font-family: var(--dhf-font-body);
+	font-size: 1rem;
+	font-weight: 700;
+	letter-spacing: 0.08em;
+	line-height: 1.3;
+	text-transform: uppercase;
+}
+
+p,
+li,
+blockquote,
+.entry-content {
+	color: var(--dhf-color-text);
+}
+
+strong,
+b {
+	color: var(--dhf-color-heading);
+}
+
+img {
+	height: auto;
+	max-width: 100%;
+}
+
+button,
+.button,
+.wp-block-button__link,
+input[type="button"],
+input[type="reset"],
+input[type="submit"] {
+	font-family: var(--dhf-font-display);
+	font-weight: 700;
+	transition:
+		transform var(--dhf-transition),
+		box-shadow var(--dhf-transition),
+		filter var(--dhf-transition);
+}
+
+button:hover,
+.button:hover,
+.wp-block-button__link:hover,
+input[type="button"]:hover,
+input[type="reset"]:hover,
+input[type="submit"]:hover {
+	transform: translateY(-1px);
+}
+
+::selection {
+	color: var(--dhf-color-heading);
+	background: var(--dhf-color-accent-soft);
+}
+
+.site-main,
+.content-area {
+	overflow-wrap: anywhere;
+}
+
+@media (max-width: 767px) {
+	body {
+		font-size: 17px;
+	}
+}

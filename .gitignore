@@ -1,0 +1,49 @@
+# OS / editors
+.DS_Store
+Thumbs.db
+desktop.ini
+.idea/
+.vscode/
+
+# Logs / temp
+*.log
+*.tmp
+*.temp
+
+# Node / frontend tooling
+node_modules/
+dist/
+build/
+.sass-cache/
+
+# PHP / Composer
+vendor/
+
+# Archives / database dumps
+*.zip
+*.tar
+*.gz
+*.sql
+/transport/
+
+# Common WordPress core / runtime paths in case someone drops a full WP install here
+/wp-admin/
+/wp-includes/
+/wp-content/cache/
+/wp-content/upgrade/
+/wp-content/uploads/
+/wp-content/mu-plugins/
+/wp-content/plugins/
+/xmlrpc.php
+/wp-*.php
+/license.txt
+/readme.html
+
+# Always keep our theme code and deployment config tracked
+!.github/
+!assets/
+!backups/
+!functions.php
+!style.css
+!README.md
+!DESIGN-SYSTEM.md

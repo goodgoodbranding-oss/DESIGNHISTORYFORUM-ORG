@@ -1,0 +1,84 @@
+{
+  "meta": {
+    "project": "Design History Forum",
+    "stack": "WordPress + Kadence Child Theme",
+    "source_files": [
+      "DESIGN-SYSTEM.md",
+      "assets/css/custom.css",
+      "style.css"
+    ]
+  },
+  "colors": {
+    "accent": "#ff760a",
+    "accentSoft": "#ffe7d4",
+    "text": "#4a4a47",
+    "heading": "#2d3748",
+    "muted": "#4a5568",
+    "border": "#e3e3e3",
+    "surface": "#ededed",
+    "paper": "#ffffff"
+  },
+  "typography": {
+    "fontDisplay": "\"Bricolage Grotesque\", sans-serif",
+    "fontBody": "\"Inter\", sans-serif",
+    "weights": {
+      "regular": 400,
+      "medium": 500,
+      "semibold": 600,
+      "bold": 700,
+      "extrabold": 800
+    },
+    "scale": {
+      "heroTitle": "clamp(2.6rem, 4vw, 4.75rem)",
+      "h2": "clamp(2.1rem, 3vw, 3.4rem)",
+      "h3": "clamp(1.7rem, 2.2vw, 2.5rem)",
+      "h4": "clamp(1.35rem, 1.8vw, 2rem)",
+      "h5": "clamp(1.15rem, 1.6vw, 1.5rem)",
+      "body": "18px",
+      "bodyMobile": "17px",
+      "overline": "1rem"
+    },
+    "lineHeight": {
+      "display": 1.08,
+      "body": 1.7,
+      "overline": 1.3
+    },
+    "letterSpacing": {
+      "display": "-0.03em",
+      "overline": "0.08em"
+    }
+  },
+  "spacing": {
+    "contentWidth": "min(1200px, calc(100vw - 48px))",
+    "scale": [4, 8, 12, 16, 24, 32, 48, 64, 96, 128]
+  },
+  "radius": {
+    "card": "24px"
+  },
+  "shadows": {
+    "soft": "0 18px 45px rgba(45, 55, 72, 0.08)"
+  },
+  "motion": {
+    "transition": "220ms ease"
+  },
+  "components": {
+    "hero": {
+      "keepImage": "staircase only",
+      "removeImage": "lower stacked image",
+      "direction": "monumental, editorial, stronger headline-to-image tension"
+    },
+    "orangeCards": {
+      "linkTarget": "https://deepbrand.ing/",
+      "interaction": "fully clickable card, tactile hover, subtle press and shadow shift"
+    },
+    "buttons": {
+      "direction": "keep current family, improve spacing and polish, avoid over-design"
+    },
+    "sections": {
+      "direction": "architectural asymmetry, tighter rhythm, less starter-template feel"
+    },
+    "footer": {
+      "direction": "more intentional ending and stronger closing CTA"
+    }
+  }
+}

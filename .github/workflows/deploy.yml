@@ -1,0 +1,35 @@
+name: Deploy Kadence Child Theme
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Deploy child theme to Hostinger via FTPS
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.HOSTINGER_FTP_SERVER }}
+          username: ${{ secrets.HOSTINGER_FTP_USERNAME }}
+          password: ${{ secrets.HOSTINGER_FTP_PASSWORD }}
+          protocol: ftps
+          port: ${{ secrets.HOSTINGER_FTP_PORT || 21 }}
+          server-dir: /public_html/wp-content/themes/kadence-child/
+          local-dir: ./
+          exclude: |
+            **/.git*
+            **/.github/**
+            **/.vscode/**
+            **/.idea/**
+            **/node_modules/**
+            backups/**
+            README.md
+            .gitignore
