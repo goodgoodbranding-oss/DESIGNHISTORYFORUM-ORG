@@ -10,6 +10,7 @@ desktop.ini
 *.tmp
 *.temp
 .tmp-homepage.html
+.tmp-*
 
 # Node / frontend tooling
 node_modules/
