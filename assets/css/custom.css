@@ -7,6 +7,7 @@
 	--dhf-font-display: "Bricolage Grotesque", sans-serif;
 	--dhf-font-body: "Inter", sans-serif;
 	--dhf-color-accent: #ff760a;
+	--dhf-color-action: #e9521c;
 	--dhf-color-accent-soft: #ffe7d4;
 	--dhf-color-text: #4a4a47;
 	--dhf-color-heading: #2d3748;
@@ -195,8 +196,6 @@ input[type="submit"]:hover {
 	font-weight: 700;
 	gap: 0.35rem;
 	justify-content: center;
-	min-height: 56px;
-	padding: 0.9rem 1.6rem;
 	position: relative;
 	text-decoration: none;
 	text-transform: none;
@@ -229,27 +228,27 @@ input[type="submit"]:hover {
 }
 
 .home .entry-content .wp-block-kadence-advancedbtn .kb-button.kb-btn-global-inherit.wp-block-kadence-singlebtn {
-	background: var(--dhf-color-paper);
-	color: var(--dhf-color-accent);
+	background: var(--dhf-color-action);
+	color: var(--dhf-color-paper);
 }
 
 .home .entry-content .wp-block-kadence-advancedbtn .kb-button.kb-btn-global-inherit.wp-block-kadence-singlebtn:hover,
 .home .entry-content .wp-block-kadence-advancedbtn .kb-button.kb-btn-global-inherit.wp-block-kadence-singlebtn:focus,
 .home .entry-content .wp-block-kadence-advancedbtn .kb-button.kb-btn-global-inherit.wp-block-kadence-singlebtn:active {
-	background: var(--dhf-color-paper);
-	color: var(--dhf-color-heading);
+	background: var(--dhf-color-action);
+	color: var(--dhf-color-paper);
 }
 
 .home .entry-content .wp-block-kadence-advancedbtn .kb-button.kb-btn-global-outline.wp-block-kadence-singlebtn {
-	background: transparent;
-	color: var(--dhf-color-accent);
+	background: var(--dhf-color-action);
+	color: var(--dhf-color-paper);
 }
 
 .home .entry-content .wp-block-kadence-advancedbtn .kb-button.kb-btn-global-outline.wp-block-kadence-singlebtn:hover,
 .home .entry-content .wp-block-kadence-advancedbtn .kb-button.kb-btn-global-outline.wp-block-kadence-singlebtn:focus,
 .home .entry-content .wp-block-kadence-advancedbtn .kb-button.kb-btn-global-outline.wp-block-kadence-singlebtn:active {
-	background: var(--dhf-color-paper);
-	color: var(--dhf-color-heading);
+	background: var(--dhf-color-action);
+	color: var(--dhf-color-paper);
 }
 
 .home .entry-content .wp-block-kadence-advancedbtn .kb-button .kt-btn-inner-text {
