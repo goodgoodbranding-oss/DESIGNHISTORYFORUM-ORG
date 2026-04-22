@@ -142,6 +142,52 @@ input[type="submit"]:hover {
 	overflow-wrap: anywhere;
 }
 
+.home .kb-row-layout-id340_ef4a37-0f > .kt-row-column-wrap {
+	align-items: center;
+	display: grid;
+	gap: clamp(2rem, 5vw, 5.5rem);
+	grid-template-columns: minmax(280px, 0.9fr) minmax(360px, 1.1fr);
+	margin-inline: auto;
+	max-width: var(--dhf-content-width);
+	min-height: auto;
+	padding-block: clamp(4rem, 7vw, 7rem) clamp(3rem, 5vw, 5rem);
+}
+
+.home .kadence-column340_933a39-2e,
+.home .kt-inside-inner-col > .kadence-column340_933a39-2e:not(.specificity) {
+	margin: 0;
+}
+
+.home .kadence-column340_e0addb-39 > .kt-inside-inner-col {
+	background-image: none !important;
+	display: block;
+	min-height: 0;
+}
+
+.home .wp-block-kadence-image.kb-image340_3371f5-8b:not(.kb-specificity-added):not(.kb-extra-specificity-added) {
+	margin: 0;
+}
+
+.home .wp-block-kadence-image.kb-image340_3371f5-8b {
+	position: relative;
+	z-index: 1;
+}
+
+.home .kb-image340_3371f5-8b .kb-is-ratio-image {
+	aspect-ratio: 4 / 5;
+}
+
+.home .kb-image340_3371f5-8b img {
+	height: 100%;
+	object-fit: cover;
+	object-position: center;
+	width: 100%;
+}
+
+.home .wp-block-kadence-image.kb-image340_77740a-f5 {
+	display: none;
+}
+
 .home .kb-row-layout-id340_24e797-25 .wp-block-kadence-column > .kt-inside-inner-col {
 	cursor: pointer;
 	position: relative;
@@ -267,8 +313,24 @@ input[type="submit"]:hover {
 	}
 }
 
+@media (max-width: 1024px) {
+	.home .kb-row-layout-id340_ef4a37-0f > .kt-row-column-wrap {
+		gap: 2.5rem;
+		grid-template-columns: 1fr;
+		padding-inline: 1.5rem;
+	}
+
+	.home .kb-image340_3371f5-8b .kb-is-ratio-image {
+		aspect-ratio: 16 / 11;
+	}
+}
+
 @media (max-width: 767px) {
 	body {
 		font-size: 17px;
+	}
+
+	.home .kb-row-layout-id340_ef4a37-0f > .kt-row-column-wrap {
+		padding-block: 3rem;
 	}
 }
