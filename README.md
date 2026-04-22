@@ -1,66 +1,31 @@
-# Kadence Child Theme
+# Design History Forum WordPress Theme
 
-To repozytorium jest zorganizowane tak, aby jego katalog glowny byl bezposrednio motywem potomnym `kadence-child`.
+Repozytorium jest folderem child theme dla Kadence i jest wdrazane na WordPress przez WP Pusher.
 
-## Co znajduje sie w repo
+## Najwazniejsze pliki
 
-- `style.css` - wymagany naglowek motywu potomnego.
-- `functions.php` - ladowanie stylow Kadence oraz naszego CSS.
-- `assets/css/custom.css` - miejsce na Wasze wlasne style.
-- `.github/workflows/deploy.yml` - automatyczny deploy na Hostingera po pushu do `main`.
-- `backups/customizer/` - backupy eksportow z Customizera Kadence.
-- `DESIGN-SYSTEM.md` - zasady projektowe i kierunek wizualny.
-- `FIGMA-HANDOFF.md` - gotowy handoff dla Claude / Figma.
-- `design-tokens.json` - kolory, typografia, spacing i komponenty w formie maszynowej.
+- `PROJECT-FLOW.md` - aktualny flow pracy, deployu i checklisty do kolejnych projektow.
+- `DESIGN-SYSTEM.md` - zasady wizualne projektu.
+- `FIGMA-HANDOFF.md` - handoff do Figmy/Claude.
+- `design-tokens.json` - tokeny kolorow, typo, spacingu i komponentow.
+- `style.css` - naglowek child theme.
+- `functions.php` - ladowanie fontow, CSS i JS.
+- `assets/css/custom.css` - glowne style strony.
+- `assets/js/homepage-cards.js` - interakcje kafelkow na homepage.
 
-## GitHub Actions - sekrety
+## Deploy
 
-Dodaj w repo do `Settings > Secrets and variables > Actions`:
+Glowny deploy idzie przez WP Pusher:
 
-- `HOSTINGER_FTP_SERVER`
-- `HOSTINGER_FTP_USERNAME`
-- `HOSTINGER_FTP_PASSWORD`
-- `HOSTINGER_FTP_PORT` - opcjonalnie, najczesciej `21`
+- repo: `goodgoodbranding-oss/DESIGNHISTORYFORUM-ORG`
+- branch: `main`
+- Push-to-Deploy: wlaczone
+- aktywny folder motywu: `DESIGNHISTORYFORUM-ORG`
 
-Jesli WordPress nie jest w `public_html`, zmien wartosc `server-dir` w workflow.
+GitHub Actions jest zostawione tylko jako reczna alternatywa awaryjna przez `workflow_dispatch`.
 
-## Jak dziala deploy
+## Robocze materialy
 
-Workflow wysyla tylko pliki tego repozytorium do:
+Folder `transport/` jest ignorowany przez git. Trzymamy tam screenshoty, plakaty, ZIP-y, eksporty robocze i materialy, ktore nie maja byc deployowane jako motyw.
 
-`/public_html/wp-content/themes/kadence-child/`
-
-Nie wysyla:
-
-- katalogu `.github`
-- backupow z `backups/`
-- lokalnych plikow konfiguracyjnych edytora
-
-## Backup ustawien wygladu
-
-Instrukcja eksportu znajduje sie w `backups/customizer/README.md`.
-
-## Jak pracujemy z designem
-
-To wazne: samo `WP Pusher` nie zmieni automatycznie strony na podstawie makiety z Figmy.
-
-Automatyczne moze byc:
-
-- `git push` do GitHuba
-- aktualizacja motywu na WordPressie przez `WP Pusher`
-- albo deploy na Hostingera przez GitHub Actions
-
-Nieautomatyczne bez dodatkowej integracji:
-
-- zamiana zmian z Figmy na kod
-- automatyczna aktualizacja `DESIGN-SYSTEM.md` na podstawie makiety
-
-Dlatego przyjmujemy prosty workflow:
-
-1. Makieta lub decyzja projektowa powstaje w Figmie.
-2. Aktualizujemy `DESIGN-SYSTEM.md` i ewentualnie `design-tokens.json`, jesli zmienia sie system.
-3. Wprowadzamy zmiany w child theme.
-4. Robimy commit i push.
-5. `WP Pusher` lub GitHub Actions aktualizuje WordPress.
-
-To daje nam jedno zrodlo prawdy dla designu i jedno zrodlo prawdy dla kodu.
+Pelna instrukcja pracy jest w `PROJECT-FLOW.md`.
