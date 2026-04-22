@@ -155,13 +155,28 @@ input[type="submit"]:hover {
 
 .home .kadence-column340_933a39-2e,
 .home .kt-inside-inner-col > .kadence-column340_933a39-2e:not(.specificity) {
+	grid-column: 2;
+	grid-row: 1;
 	margin: 0;
 }
 
+.home .kadence-column340_e0addb-39 {
+	grid-column: 1;
+	grid-row: 1;
+}
+
+.home .kadence-column340_6713bb-e9 {
+	display: none;
+}
+
 .home .kadence-column340_e0addb-39 > .kt-inside-inner-col {
-	background-image: none !important;
+	aspect-ratio: 4 / 5;
+	background-image: url("/wp-content/uploads/2026/04/hotel-cracovia.png") !important;
+	background-position: center;
+	background-repeat: no-repeat;
+	background-size: cover;
 	display: block;
-	min-height: 0;
+	min-height: clamp(420px, 56vw, 680px);
 }
 
 .home .wp-block-kadence-image.kb-image340_3371f5-8b:not(.kb-specificity-added):not(.kb-extra-specificity-added) {
@@ -318,6 +333,25 @@ input[type="submit"]:hover {
 		gap: 2.5rem;
 		grid-template-columns: 1fr;
 		padding-inline: 1.5rem;
+	}
+
+	.home .kadence-column340_933a39-2e,
+	.home .kt-inside-inner-col > .kadence-column340_933a39-2e:not(.specificity),
+	.home .kadence-column340_e0addb-39 {
+		grid-column: 1;
+	}
+
+	.home .kadence-column340_e0addb-39 {
+		grid-row: 1;
+	}
+
+	.home .kadence-column340_933a39-2e,
+	.home .kt-inside-inner-col > .kadence-column340_933a39-2e:not(.specificity) {
+		grid-row: 2;
+	}
+
+	.home .kadence-column340_e0addb-39 > .kt-inside-inner-col {
+		min-height: clamp(320px, 70vw, 540px);
 	}
 
 	.home .kb-image340_3371f5-8b .kb-is-ratio-image {
