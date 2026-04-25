@@ -203,6 +203,23 @@ input[type="submit"]:hover {
 	display: none;
 }
 
+.home .kt-adv-heading340_2cfe6c-80,
+.home .kt-adv-heading340_2cfe6c-80[data-kb-block="kb-adv-heading340_2cfe6c-80"] {
+	--dhf-hero-wdth: 100;
+	--dhf-hero-stretch: 100%;
+	font-stretch: var(--dhf-hero-stretch);
+	font-variation-settings: "wdth" var(--dhf-hero-wdth), "wght" 800;
+	transition: font-variation-settings 140ms ease-out, font-stretch 140ms ease-out;
+	will-change: font-variation-settings;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.home .kt-adv-heading340_2cfe6c-80,
+	.home .kt-adv-heading340_2cfe6c-80[data-kb-block="kb-adv-heading340_2cfe6c-80"] {
+		transition: none;
+	}
+}
+
 .home .kb-row-layout-id340_24e797-25 .wp-block-kadence-column > .kt-inside-inner-col {
 	cursor: pointer;
 	position: relative;

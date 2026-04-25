@@ -15,10 +15,7 @@ function dhf_kadence_child_enqueue_styles() {
 	$parent_theme  = $theme->parent();
 	$child_css_rel = '/assets/css/custom.css';
 	$child_css_abs = get_stylesheet_directory() . $child_css_rel;
-	$font_query    = array(
-		'family'  => 'Bricolage+Grotesque:wght@400;500;700;800|Inter:wght@400;500;600;700;800',
-		'display' => 'swap',
-	);
+	$google_fonts  = 'https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,400..800&family=Inter:wght@400;500;600;700;800&display=swap';
 
 	wp_enqueue_style(
 		'kadence-parent-style',
@@ -29,7 +26,7 @@ function dhf_kadence_child_enqueue_styles() {
 
 	wp_enqueue_style(
 		'dhf-google-fonts',
-		add_query_arg( $font_query, 'https://fonts.googleapis.com/css' ),
+		$google_fonts,
 		array(),
 		null
 	);
