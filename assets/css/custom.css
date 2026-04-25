@@ -153,6 +153,10 @@ input[type="submit"]:hover {
 	padding-block: clamp(4rem, 7vw, 7rem) clamp(3rem, 5vw, 5rem);
 }
 
+.home .kb-row-layout-id340_ef4a37-0f > .kt-row-column-wrap > p {
+	display: none;
+}
+
 .home .kadence-column340_933a39-2e,
 .home .kt-inside-inner-col > .kadence-column340_933a39-2e:not(.specificity) {
 	grid-column: 2;
@@ -161,8 +165,11 @@ input[type="submit"]:hover {
 }
 
 .home .kadence-column340_e0addb-39 {
+	align-self: stretch;
+	display: block;
 	grid-column: 1;
 	grid-row: 1;
+	min-width: 0;
 }
 
 .home .kadence-column340_6713bb-e9 {
@@ -177,6 +184,12 @@ input[type="submit"]:hover {
 	background-size: contain;
 	display: block;
 	min-height: clamp(460px, 60vw, 760px);
+	width: 100%;
+}
+
+.home .kadence-column340_e0addb-39 .wp-block-kadence-image,
+.home .kadence-column340_e0addb-39 figure {
+	display: none;
 }
 
 .home .wp-block-kadence-image.kb-image340_3371f5-8b:not(.kb-specificity-added):not(.kb-extra-specificity-added) {
