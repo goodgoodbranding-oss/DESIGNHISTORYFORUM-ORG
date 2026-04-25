@@ -170,13 +170,13 @@ input[type="submit"]:hover {
 }
 
 .home .kadence-column340_e0addb-39 > .kt-inside-inner-col {
-	aspect-ratio: 4 / 5;
-	background-image: url("/wp-content/uploads/2026/04/hotel-cracovia.png") !important;
-	background-position: center;
+	aspect-ratio: 563 / 793;
+	background-image: url("/wp-content/themes/DESIGNHISTORYFORUM-ORG/assets/images/hero-left-poster.webp") !important;
+	background-position: center center;
 	background-repeat: no-repeat;
-	background-size: cover;
+	background-size: contain;
 	display: block;
-	min-height: clamp(420px, 56vw, 680px);
+	min-height: clamp(460px, 60vw, 760px);
 }
 
 .home .wp-block-kadence-image.kb-image340_3371f5-8b:not(.kb-specificity-added):not(.kb-extra-specificity-added) {
@@ -368,7 +368,7 @@ input[type="submit"]:hover {
 	}
 
 	.home .kadence-column340_e0addb-39 > .kt-inside-inner-col {
-		min-height: clamp(320px, 70vw, 540px);
+		min-height: clamp(360px, 78vw, 620px);
 	}
 
 	.home .kb-image340_3371f5-8b .kb-is-ratio-image {
