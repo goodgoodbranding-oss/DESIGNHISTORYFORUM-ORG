@@ -463,6 +463,24 @@ input[type="submit"]:hover {
 	display: none !important;
 }
 
+.single-post .entry-related-carousel .splide__pagination {
+	flex-wrap: nowrap !important;
+	gap: 0.45rem;
+	justify-content: center;
+	overflow: hidden;
+}
+
+.single-post .entry-related-carousel .splide__pagination li {
+	flex: 0 0 auto;
+	margin: 0 !important;
+}
+
+.single-post .entry-related-carousel .splide__pagination__page {
+	height: 0.82rem;
+	margin: 0 !important;
+	width: 0.82rem;
+}
+
 @media (prefers-reduced-motion: reduce) {
 	.home .kb-row-layout-id340_24e797-25 .wp-block-kadence-column > .kt-inside-inner-col {
 		transition: none;

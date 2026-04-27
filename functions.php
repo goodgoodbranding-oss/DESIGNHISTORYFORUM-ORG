@@ -75,6 +75,10 @@ function dhf_append_article_tools( $content ) {
 		return $content;
 	}
 
+	if ( get_the_ID() !== (int) get_queried_object_id() ) {
+		return $content;
+	}
+
 	$post_url   = get_permalink();
 	$post_title = wp_strip_all_tags( get_the_title() );
 	$site_name  = get_bloginfo( 'name' );
