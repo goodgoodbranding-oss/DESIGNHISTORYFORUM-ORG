@@ -459,6 +459,10 @@ input[type="submit"]:hover {
 	transform: translateY(110%);
 }
 
+.single-post .wp-block-kadence-advancedgallery .splide__pagination {
+	display: none !important;
+}
+
 @media (prefers-reduced-motion: reduce) {
 	.home .kb-row-layout-id340_24e797-25 .wp-block-kadence-column > .kt-inside-inner-col {
 		transition: none;
