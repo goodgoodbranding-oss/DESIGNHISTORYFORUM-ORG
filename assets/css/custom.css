@@ -416,21 +416,28 @@ input[type="submit"]:hover {
 	border: 2px solid currentColor;
 	border-radius: 999px;
 	display: inline-flex;
-	font-family: var(--dhf-font-display);
-	font-size: 0.82rem;
-	font-weight: 700;
-	height: 2.4rem;
+	height: 4.1rem;
 	justify-content: center;
-	letter-spacing: -0.01em;
 	line-height: 1;
-	min-width: 2.4rem;
-	padding-inline: 0.72rem;
+	min-width: 4.1rem;
+	padding-inline: 0.9rem;
 	text-transform: none;
+}
+
+.single-post .dhf-article-tools__icon {
+	display: block;
+	height: 1.55rem;
+	max-width: 1.85rem;
+	width: auto;
 }
 
 .single-post .dhf-article-tools__chip--share .dhf-article-tools__badge {
 	font-family: var(--dhf-font-body);
+	font-size: 0.82rem;
 	font-weight: 700;
+	height: 4.1rem;
+	letter-spacing: -0.01em;
+	min-width: 4.1rem;
 }
 
 .single-post .dhf-article-tools__hint {

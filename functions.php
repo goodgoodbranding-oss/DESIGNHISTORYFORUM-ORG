@@ -65,6 +65,112 @@ function dhf_kadence_child_enqueue_styles() {
 add_action( 'wp_enqueue_scripts', 'dhf_kadence_child_enqueue_styles' );
 
 /**
+ * Normalize plain-text content for prompts and data attributes.
+ *
+ * @param string $text Raw text.
+ * @return string
+ */
+function dhf_normalize_prompt_text( $text ) {
+	$text = html_entity_decode( wp_strip_all_tags( (string) $text ), ENT_QUOTES, get_bloginfo( 'charset' ) );
+	$text = preg_replace( '/\s+/u', ' ', trim( $text ) );
+
+	return is_string( $text ) ? $text : '';
+}
+
+/**
+ * Extract a short list of section headings from article content.
+ *
+ * @param string $content Article HTML.
+ * @return string[]
+ */
+function dhf_extract_article_headings( $content ) {
+	$headings = array();
+
+	if ( preg_match_all( '/<h[2-4][^>]*>(.*?)<\/h[2-4]>/is', $content, $matches ) ) {
+		foreach ( $matches[1] as $heading ) {
+			$heading = dhf_normalize_prompt_text( $heading );
+
+			if ( '' === $heading ) {
+				continue;
+			}
+
+			$headings[] = $heading;
+
+			if ( count( $headings ) >= 6 ) {
+				break;
+			}
+		}
+	}
+
+	return $headings;
+}
+
+/**
+ * Build a structured AI prompt from the current article.
+ *
+ * @param int    $post_id  Current post ID.
+ * @param string $content  Article HTML.
+ * @return string
+ */
+function dhf_build_article_prompt( $post_id, $content ) {
+	$post_title = dhf_normalize_prompt_text( get_the_title( $post_id ) );
+	$post_url   = get_permalink( $post_id );
+	$site_name  = dhf_normalize_prompt_text( get_bloginfo( 'name' ) );
+	$categories = wp_get_post_terms( $post_id, 'category', array( 'fields' => 'names' ) );
+	$tags       = wp_get_post_terms( $post_id, 'post_tag', array( 'fields' => 'names' ) );
+	$lead       = has_excerpt( $post_id ) ? get_the_excerpt( $post_id ) : $content;
+	$lead       = wp_trim_words( dhf_normalize_prompt_text( $lead ), 55, '…' );
+	$body       = wp_trim_words( dhf_normalize_prompt_text( $content ), 220, '…' );
+	$headings   = dhf_extract_article_headings( $content );
+
+	$category_line = ! empty( $categories ) ? implode( ', ', array_map( 'dhf_normalize_prompt_text', $categories ) ) : 'Not specified';
+	$tag_line      = ! empty( $tags ) ? implode( ', ', array_map( 'dhf_normalize_prompt_text', $tags ) ) : 'Not specified';
+	$heading_line  = ! empty( $headings ) ? implode( ' | ', $headings ) : 'No subheadings extracted';
+
+	$sections = array(
+		'Działaj jako ekspert sztuki użytkowej i osobisty kurator reprezentujący ' . $site_name . '.',
+		'Cel: zamień ten artykuł w użyteczny, konkretny przewodnik dla czytelnika zainteresowanego krakowskim designem.',
+		implode(
+			"\n",
+			array(
+				'Materiał źródłowy:',
+				'Tytuł artykułu: ' . $post_title,
+				'URL: ' . $post_url,
+				'Kategoria wpisu: ' . $category_line,
+				'Tagi wpisu: ' . $tag_line,
+				'Śródtytuły: ' . $heading_line,
+				'Lead / skrót: ' . $lead,
+				'Skrócona treść artykułu: ' . $body,
+			)
+		),
+		'Jeśli nie masz jawnych preferencji użytkownika, wywnioskuj najbardziej prawdopodobne zainteresowania na podstawie kategorii, tagów i treści artykułu. Nazwij je krótko jako "Założone zainteresowania".',
+		implode(
+			"\n",
+			array(
+				'Wykonaj dwie rzeczy:',
+				'1. Wyciągnij z artykułu najważniejszą lekcję dotyczącą krakowskiego designu, która najlepiej łączy się z tymi zainteresowaniami.',
+				'2. Zaproponuj 2 kolejne tropy do odkrycia w Krakowie (np. kawiarnie, butiki, muzea, miejsca lub doświadczenia związane z designem) oraz 1 kolejny artykuł z Design History Forum, który warto przeczytać później.',
+				'3. Jeśli nie masz pewności co do konkretnych partnerów lub oferty handlowej, nie zmyślaj nazw. Zamiast tego opisz typ miejsca i uzasadnij wybór.',
+			)
+		),
+		implode(
+			"\n",
+			array(
+				'Sformatuj odpowiedź w Markdown w trzech sekcjach:',
+				'Local Context: jeden zwięzły akapit.',
+				'Why This Fits: lista wypunktowana łącząca treść artykułu z zainteresowaniami użytkownika.',
+				'Your Next Step: konkretne rekomendacje, miejsca i dalsza ścieżka czytania.',
+			)
+		),
+		'Odpowiadaj w tonie entuzjastycznym, profesjonalnym i zwięzłym. Bądź bezpośredni i unikaj lania wody.',
+		'Nie zmyślaj cytatów ani faktów spoza materiału źródłowego. Jeśli coś wnioskujesz, oznacz to jako interpretację.',
+		'Odpowiedz w tym samym języku co artykuł, chyba że użytkownik poprosi inaczej.',
+	);
+
+	return implode( "\n\n", $sections );
+}
+
+/**
  * Insert AI summary/share tools at the start of article content.
  *
  * @param string $content Post content.
@@ -79,40 +185,36 @@ function dhf_append_article_tools( $content ) {
 		return $content;
 	}
 
-	$post_url   = get_permalink();
-	$post_title = wp_strip_all_tags( get_the_title() );
-	$site_name  = get_bloginfo( 'name' );
-	$prompt     = sprintf(
-		'Please summarize this article in 5 bullet points, then list 3 key takeaways and 3 related topics to explore. Article title: %1$s. Website: %2$s. URL: %3$s',
-		$post_title,
-		$site_name,
-		$post_url
-	);
+	$post_id    = get_the_ID();
+	$post_url   = get_permalink( $post_id );
+	$post_title = wp_strip_all_tags( get_the_title( $post_id ) );
+	$prompt     = dhf_build_article_prompt( $post_id, $content );
+	$icons_base = trailingslashit( get_stylesheet_directory_uri() ) . 'assets/images/ai-icons/';
 
 	$ai_tools = array(
 		array(
 			'label' => 'ChatGPT',
-			'badge' => 'GPT',
+			'icon'  => $icons_base . 'gpt.svg',
 			'url'   => 'https://chatgpt.com/',
 		),
 		array(
 			'label' => 'Claude',
-			'badge' => 'CL',
+			'icon'  => $icons_base . 'claude.svg',
 			'url'   => 'https://claude.ai/new',
 		),
 		array(
 			'label' => 'Gemini',
-			'badge' => 'GM',
+			'icon'  => $icons_base . 'gemini.svg',
 			'url'   => 'https://gemini.google.com/app',
 		),
 		array(
 			'label' => 'Perplexity',
-			'badge' => 'PX',
+			'icon'  => $icons_base . 'perplexity.svg',
 			'url'   => 'https://www.perplexity.ai/',
 		),
 		array(
 			'label' => 'Grok',
-			'badge' => 'GX',
+			'icon'  => $icons_base . 'grok.svg',
 			'url'   => 'https://grok.com/',
 		),
 	);
@@ -156,12 +258,20 @@ function dhf_append_article_tools( $content ) {
 						data-ai-tool
 						data-ai-label="<?php echo esc_attr( $tool['label'] ); ?>"
 					>
-						<span class="dhf-article-tools__badge" aria-hidden="true"><?php echo esc_html( $tool['badge'] ); ?></span>
+						<span class="dhf-article-tools__badge" aria-hidden="true">
+							<img
+								class="dhf-article-tools__icon"
+								src="<?php echo esc_url( $tool['icon'] ); ?>"
+								alt=""
+								loading="lazy"
+								decoding="async"
+							/>
+						</span>
 						<span class="screen-reader-text"><?php echo esc_html( $tool['label'] ); ?></span>
 					</a>
 				<?php endforeach; ?>
 			</div>
-			<p class="dhf-article-tools__hint">Klikniecie kopiuje prompt i otwiera wybrane narzedzie w nowej karcie.</p>
+			<p class="dhf-article-tools__hint">Kliknięcie kopiuje prompt zbudowany z treści artykułu i otwiera wybrane narzędzie. Wklej prompt skrótem Ctrl+V.</p>
 		</div>
 		<div class="dhf-article-tools__group dhf-article-tools__group--share">
 			<p class="dhf-article-tools__label">Share:</p>
