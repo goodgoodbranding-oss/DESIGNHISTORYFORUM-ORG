@@ -55,41 +55,16 @@
 		};
 
 		block.querySelectorAll("[data-ai-tool]").forEach(function (link) {
-			link.addEventListener("click", function (event) {
+			link.addEventListener("click", function () {
 				var label = link.getAttribute("data-ai-label") || "AI";
-				var targetUrl = link.getAttribute("href") || "";
-				var popup = null;
-
-				event.preventDefault();
-
-				try {
-					popup = window.open("", "_blank", "noopener,noreferrer");
-
-					if (popup) {
-						popup.opener = null;
-					}
-				} catch (error) {
-					popup = null;
-				}
-
-				var finishOpen = function () {
-					if (popup && !popup.closed) {
-						popup.location = targetUrl;
-						return;
-					}
-
-					window.open(targetUrl, "_blank", "noopener,noreferrer");
-				};
 
 				copyText(prompt)
 					.then(function () {
 						showToast("Prompt copied for " + label + ". Paste with Ctrl+V.");
-						finishOpen();
 					})
 					.catch(function () {
 						window.prompt("Skopiuj prompt do " + label + ":", prompt);
 						showToast("Prompt ready to paste into " + label + ".");
-						finishOpen();
 					});
 			});
 		});
