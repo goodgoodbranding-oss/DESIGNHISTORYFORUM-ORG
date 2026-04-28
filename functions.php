@@ -177,30 +177,40 @@ function dhf_build_article_prompt( $post_id, $content ) {
  * @return string
  */
 function dhf_append_article_tools( $content ) {
-	if ( is_admin() || ! is_singular( 'post' ) || ! in_the_loop() || ! is_main_query() ) {
+	static $rendered_posts = array();
+
+	if ( is_admin() || ! is_singular( 'post' ) ) {
 		return $content;
 	}
 
-	if ( get_the_ID() !== (int) get_queried_object_id() ) {
+	$post_id = (int) get_the_ID();
+
+	if ( $post_id !== (int) get_queried_object_id() ) {
 		return $content;
 	}
 
-	$post_id    = get_the_ID();
+	if ( in_array( $post_id, $rendered_posts, true ) ) {
+		return $content;
+	}
+
 	$post_url   = get_permalink( $post_id );
 	$post_title = wp_strip_all_tags( get_the_title( $post_id ) );
 	$prompt     = dhf_build_article_prompt( $post_id, $content );
+	$prompt_url = rawurlencode( $prompt );
 	$icons_base = trailingslashit( get_stylesheet_directory_uri() ) . 'assets/images/ai-icons/';
+
+	$rendered_posts[] = $post_id;
 
 	$ai_tools = array(
 		array(
 			'label' => 'ChatGPT',
 			'icon'  => $icons_base . 'gpt.svg',
-			'url'   => 'https://chatgpt.com/',
+			'url'   => 'https://chatgpt.com/?hints=search&prompt=' . $prompt_url,
 		),
 		array(
 			'label' => 'Claude',
 			'icon'  => $icons_base . 'claude.svg',
-			'url'   => 'https://claude.ai/new',
+			'url'   => 'https://claude.ai/new?q=' . $prompt_url,
 		),
 		array(
 			'label' => 'Gemini',
@@ -210,7 +220,7 @@ function dhf_append_article_tools( $content ) {
 		array(
 			'label' => 'Perplexity',
 			'icon'  => $icons_base . 'perplexity.svg',
-			'url'   => 'https://www.perplexity.ai/',
+			'url'   => 'https://www.perplexity.ai/search/new?q=' . $prompt_url,
 		),
 		array(
 			'label' => 'Grok',
@@ -271,7 +281,7 @@ function dhf_append_article_tools( $content ) {
 					</a>
 				<?php endforeach; ?>
 			</div>
-			<p class="dhf-article-tools__hint">Kliknięcie kopiuje prompt zbudowany z treści artykułu i otwiera wybrane narzędzie. Wklej prompt skrótem Ctrl+V.</p>
+			<p class="dhf-article-tools__hint">Kliknięcie kopiuje prompt zbudowany z treści artykułu i otwiera wybrane narzędzie. ChatGPT, Claude i Perplexity dostają też prompt w deeplinku; w razie potrzeby użyj Ctrl+V.</p>
 		</div>
 		<div class="dhf-article-tools__group dhf-article-tools__group--share">
 			<p class="dhf-article-tools__label">Share:</p>
