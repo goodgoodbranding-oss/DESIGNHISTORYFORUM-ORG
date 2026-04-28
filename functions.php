@@ -128,8 +128,8 @@ function dhf_build_article_prompt( $post_id, $content ) {
 	$heading_line  = ! empty( $headings ) ? implode( ' | ', $headings ) : 'No subheadings extracted';
 
 	$sections = array(
-		'Działaj jako ekspert sztuki użytkowej i osobisty kurator reprezentujący ' . $site_name . '.',
-		'Cel: zamień ten artykuł w użyteczny, konkretny przewodnik dla czytelnika zainteresowanego krakowskim designem.',
+		'Działaj jako lokalny kurator designu, przewodnik po Krakowie i osobisty concierge reprezentujący ' . $site_name . '.',
+		'Cel: zamień ten artykuł w konkretną, autorską ścieżkę zwiedzania dla turysty zainteresowanego designem, architekturą, kulturą wizualną i miejskimi detalami.',
 		implode(
 			"\n",
 			array(
@@ -147,22 +147,27 @@ function dhf_build_article_prompt( $post_id, $content ) {
 		implode(
 			"\n",
 			array(
-				'Wykonaj dwie rzeczy:',
-				'1. Wyciągnij z artykułu najważniejszą lekcję dotyczącą krakowskiego designu, która najlepiej łączy się z tymi zainteresowaniami.',
-				'2. Zaproponuj 2 kolejne tropy do odkrycia w Krakowie (np. kawiarnie, butiki, muzea, miejsca lub doświadczenia związane z designem) oraz 1 kolejny artykuł z Design History Forum, który warto przeczytać później.',
-				'3. Jeśli nie masz pewności co do konkretnych partnerów lub oferty handlowej, nie zmyślaj nazw. Zamiast tego opisz typ miejsca i uzasadnij wybór.',
+				'Wykonaj zadanie jako plan zwiedzania:',
+				'1. Wyciągnij z artykułu główny motyw projektowy lub historyczny, który powinien stać się osią spaceru.',
+				'2. Zaproponuj fragment Krakowa lub typ okolicy, od którego warto zacząć zwiedzanie w duchu tego artykułu.',
+				'3. Ułóż krótką ścieżkę odkrywania miasta z 4-6 punktami: co zobaczyć, na jakie detale zwrócić uwagę i dlaczego to pasuje do tematu wpisu.',
+				'4. Dodaj rekomendacje praktyczne: gdzie napić się kawy i zjeść ciastko, gdzie kupić pamiątkę lub obiekt związany z designem, oraz gdzie zjeść obiad, cały czas utrzymując motyw designu w tle.',
+				'5. Dodaj 1 kolejny artykuł z Design History Forum, który naturalnie rozwija tę trasę.',
+				'6. Jeśli nie masz pewności co do konkretnych adresów lub partnerów, nie zmyślaj nazw. Zamiast tego opisz typ miejsca, atmosferę i uzasadnij wybór.',
 			)
 		),
 		implode(
 			"\n",
 			array(
-				'Sformatuj odpowiedź w Markdown w trzech sekcjach:',
-				'Local Context: jeden zwięzły akapit.',
-				'Why This Fits: lista wypunktowana łącząca treść artykułu z zainteresowaniami użytkownika.',
-				'Your Next Step: konkretne rekomendacje, miejsca i dalsza ścieżka czytania.',
+				'Sformatuj odpowiedź w Markdown w pięciu sekcjach:',
+				'Design Route: 1 krótki akapit, jaki jest motyw spaceru i dla kogo jest ta trasa.',
+				'City Fragment: wskaż część miasta albo typ miejsca, od którego warto zacząć.',
+				'What To See: lista punktów spaceru z krótkim komentarzem kuratorskim.',
+				'Where To Stop: trzy podsekcje: coffee & cake, souvenir / design object, lunch.',
+				'Next Step: 1 kolejny artykuł DHF i 1 krótkie uzasadnienie, dlaczego warto czytać dalej.',
 			)
 		),
-		'Odpowiadaj w tonie entuzjastycznym, profesjonalnym i zwięzłym. Bądź bezpośredni i unikaj lania wody.',
+		'Odpowiadaj w tonie entuzjastycznym, profesjonalnym, miejskim i konkretnym. Bądź bezpośredni i unikaj lania wody.',
 		'Nie zmyślaj cytatów ani faktów spoza materiału źródłowego. Jeśli coś wnioskujesz, oznacz to jako interpretację.',
 		'Odpowiedz w tym samym języku co artykuł, chyba że użytkownik poprosi inaczej.',
 	);
@@ -257,7 +262,7 @@ function dhf_append_article_tools( $content ) {
 		data-title="<?php echo esc_attr( $post_title ); ?>"
 	>
 		<div class="dhf-article-tools__group">
-			<p class="dhf-article-tools__label">Podsumuj z AI:</p>
+			<p class="dhf-article-tools__label">Zaplanuj z AI:</p>
 			<div class="dhf-article-tools__actions" aria-label="AI summary tools">
 				<?php foreach ( $ai_tools as $tool ) : ?>
 					<a
@@ -281,7 +286,7 @@ function dhf_append_article_tools( $content ) {
 					</a>
 				<?php endforeach; ?>
 			</div>
-			<p class="dhf-article-tools__hint">Kliknięcie kopiuje prompt zbudowany z treści artykułu i otwiera wybrane narzędzie. ChatGPT, Claude i Perplexity dostają też prompt w deeplinku; w razie potrzeby użyj Ctrl+V.</p>
+			<p class="dhf-article-tools__hint">Kliknij ikonę, aby otworzyć AI z gotowym zadaniem: stwórz trasę zwiedzania inspirowaną tym artykułem i podpowiedz, co zobaczyć, gdzie napić się kawy, kupić pamiątkę i zjeść obiad. Jeśli pole promptu nie uzupełni się samo, użyj Ctrl+V.</p>
 		</div>
 		<div class="dhf-article-tools__group dhf-article-tools__group--share">
 			<p class="dhf-article-tools__label">Share:</p>
