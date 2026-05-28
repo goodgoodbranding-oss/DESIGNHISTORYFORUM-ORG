@@ -106,71 +106,170 @@ function dhf_extract_article_headings( $content ) {
 }
 
 /**
- * Build a structured AI prompt from the current article.
+ * Build normalized article context used by AI prompts.
  *
- * @param int    $post_id  Current post ID.
- * @param string $content  Article HTML.
- * @return string
+ * @param int    $post_id Current post ID.
+ * @param string $content Article HTML.
+ * @return array<string, string>
  */
-function dhf_build_article_prompt( $post_id, $content ) {
+function dhf_get_article_prompt_context( $post_id, $content ) {
 	$post_title = dhf_normalize_prompt_text( get_the_title( $post_id ) );
 	$post_url   = get_permalink( $post_id );
 	$site_name  = dhf_normalize_prompt_text( get_bloginfo( 'name' ) );
 	$categories = wp_get_post_terms( $post_id, 'category', array( 'fields' => 'names' ) );
 	$tags       = wp_get_post_terms( $post_id, 'post_tag', array( 'fields' => 'names' ) );
 	$lead       = has_excerpt( $post_id ) ? get_the_excerpt( $post_id ) : $content;
-	$lead       = wp_trim_words( dhf_normalize_prompt_text( $lead ), 55, '…' );
-	$body       = wp_trim_words( dhf_normalize_prompt_text( $content ), 220, '…' );
+	$lead       = wp_trim_words( dhf_normalize_prompt_text( $lead ), 55, '...' );
+	$body       = wp_trim_words( dhf_normalize_prompt_text( $content ), 220, '...' );
 	$headings   = dhf_extract_article_headings( $content );
 
-	$category_line = ! empty( $categories ) ? implode( ', ', array_map( 'dhf_normalize_prompt_text', $categories ) ) : 'Not specified';
-	$tag_line      = ! empty( $tags ) ? implode( ', ', array_map( 'dhf_normalize_prompt_text', $tags ) ) : 'Not specified';
-	$heading_line  = ! empty( $headings ) ? implode( ' | ', $headings ) : 'No subheadings extracted';
-
-	$sections = array(
-		'Działaj jako lokalny kurator designu, przewodnik po Krakowie i osobisty concierge reprezentujący ' . $site_name . '.',
-		'Cel: zamień ten artykuł w konkretną, autorską ścieżkę zwiedzania dla turysty zainteresowanego designem, architekturą, kulturą wizualną i miejskimi detalami.',
-		implode(
-			"\n",
-			array(
-				'Materiał źródłowy:',
-				'Tytuł artykułu: ' . $post_title,
-				'URL: ' . $post_url,
-				'Kategoria wpisu: ' . $category_line,
-				'Tagi wpisu: ' . $tag_line,
-				'Śródtytuły: ' . $heading_line,
-				'Lead / skrót: ' . $lead,
-				'Skrócona treść artykułu: ' . $body,
-			)
-		),
-		'Jeśli nie masz jawnych preferencji użytkownika, wywnioskuj najbardziej prawdopodobne zainteresowania na podstawie kategorii, tagów i treści artykułu. Nazwij je krótko jako "Założone zainteresowania".',
-		implode(
-			"\n",
-			array(
-				'Wykonaj zadanie jako plan zwiedzania:',
-				'1. Wyciągnij z artykułu główny motyw projektowy lub historyczny, który powinien stać się osią spaceru.',
-				'2. Zaproponuj fragment Krakowa lub typ okolicy, od którego warto zacząć zwiedzanie w duchu tego artykułu.',
-				'3. Ułóż krótką ścieżkę odkrywania miasta z 4-6 punktami: co zobaczyć, na jakie detale zwrócić uwagę i dlaczego to pasuje do tematu wpisu.',
-				'4. Dodaj rekomendacje praktyczne: gdzie napić się kawy i zjeść ciastko, gdzie kupić pamiątkę lub obiekt związany z designem, oraz gdzie zjeść obiad, cały czas utrzymując motyw designu w tle.',
-				'5. Dodaj 1 kolejny artykuł z Design History Forum, który naturalnie rozwija tę trasę.',
-				'6. Jeśli nie masz pewności co do konkretnych adresów lub partnerów, nie zmyślaj nazw. Zamiast tego opisz typ miejsca, atmosferę i uzasadnij wybór.',
-			)
-		),
-		implode(
-			"\n",
-			array(
-				'Sformatuj odpowiedź w Markdown w pięciu sekcjach:',
-				'Design Route: 1 krótki akapit, jaki jest motyw spaceru i dla kogo jest ta trasa.',
-				'City Fragment: wskaż część miasta albo typ miejsca, od którego warto zacząć.',
-				'What To See: lista punktów spaceru z krótkim komentarzem kuratorskim.',
-				'Where To Stop: trzy podsekcje: coffee & cake, souvenir / design object, lunch.',
-				'Next Step: 1 kolejny artykuł DHF i 1 krótkie uzasadnienie, dlaczego warto czytać dalej.',
-			)
-		),
-		'Odpowiadaj w tonie entuzjastycznym, profesjonalnym, miejskim i konkretnym. Bądź bezpośredni i unikaj lania wody.',
-		'Nie zmyślaj cytatów ani faktów spoza materiału źródłowego. Jeśli coś wnioskujesz, oznacz to jako interpretację.',
-		'Odpowiedz w tym samym języku co artykuł, chyba że użytkownik poprosi inaczej.',
+	return array(
+		'post_title'    => $post_title,
+		'post_url'      => $post_url,
+		'site_name'     => $site_name,
+		'category_line' => ! empty( $categories ) ? implode( ', ', array_map( 'dhf_normalize_prompt_text', $categories ) ) : 'Not specified',
+		'tag_line'      => ! empty( $tags ) ? implode( ', ', array_map( 'dhf_normalize_prompt_text', $tags ) ) : 'Not specified',
+		'heading_line'  => ! empty( $headings ) ? implode( ' | ', $headings ) : 'No subheadings extracted',
+		'lead'          => $lead,
+		'body'          => $body,
 	);
+}
+
+/**
+ * Return the editable prompt template for article AI tools.
+ *
+ * Keep the prompt copy in one place so it is easy to change later.
+ *
+ * @param array<string, string> $context Normalized article context.
+ * @return string[]
+ */
+function dhf_get_article_prompt_sections( $context ) {
+	return array(
+		'Act as a local design curator, Krakow guide, and personal concierge representing ' . $context['site_name'] . '.',
+		'Goal: turn this article into a concrete, original city route for a visitor interested in design, architecture, visual culture, and urban details.',
+		'Treat the article content as the primary reference material. Base your interpretation, route logic, and recommendations mainly on the information and cues provided below.',
+		implode(
+			"\n",
+			array(
+				'Reference material:',
+				'Article title: ' . $context['post_title'],
+				'URL: ' . $context['post_url'],
+				'Category: ' . $context['category_line'],
+				'Tags: ' . $context['tag_line'],
+				'Subheadings: ' . $context['heading_line'],
+				'Lead / summary: ' . $context['lead'],
+				'Condensed article body: ' . $context['body'],
+			)
+		),
+		'If you do not have explicit user preferences, infer the most likely interests from the category, tags, and article content. Name them briefly as "Assumed Interests".',
+		implode(
+			"\n",
+			array(
+				'Complete the task as a city route plan:',
+				'1. Extract the main design or historical theme from the article and use it as the route spine.',
+				'2. Suggest the Krakow district, street cluster, or type of area where the visitor should begin.',
+				'3. Build a short discovery route with 4-6 stops: what to see, which details to notice, and why each stop fits the article theme.',
+				'4. Add practical recommendations: where to stop for coffee and cake, where to find a souvenir or design-related object, and where to have lunch, while keeping the design theme in the background.',
+				'5. Add 1 next article from Design History Forum that naturally extends this route.',
+				'6. If you are not certain about specific addresses or partners, do not invent names. Instead, describe the type of place, the atmosphere, and the reason for the recommendation.',
+			)
+		),
+		implode(
+			"\n",
+			array(
+				'Format the response in Markdown using five sections:',
+				'Design Route: 1 short paragraph explaining the route theme and who it is for.',
+				'City Fragment: identify the part of the city or type of place where the route should begin.',
+				'What To See: a list of route stops with short curatorial notes.',
+				'Where To Stop: three subsections: coffee & cake, souvenir / design object, lunch.',
+				'Next Step: 1 next DHF article and 1 short reason why it is the right continuation.',
+			)
+		),
+		'Respond in an enthusiastic, professional, urban, and specific tone. Be direct and avoid filler.',
+		'Do not invent quotes or facts outside the reference material. If you infer something, label it as interpretation.',
+		'Respond in English unless the user explicitly asks for another language.',
+	);
+}
+
+/**
+ * Return AI tool definitions in one editable place.
+ *
+ * @param string $icons_base Base URL for tool icons.
+ * @return array<int, array<string, string>>
+ */
+function dhf_get_article_ai_tool_definitions( $icons_base ) {
+	return array(
+		array(
+			'label'        => 'ChatGPT',
+			'icon'         => $icons_base . 'gpt.svg',
+			'url_template' => 'https://chatgpt.com/?hints=search&prompt=%s',
+			'launch_mode'  => 'prefill',
+			'copy_notice'  => 'Prompt copied for ChatGPT. Paste with Ctrl+V if needed.',
+		),
+		array(
+			'label'        => 'Claude',
+			'icon'         => $icons_base . 'claude.svg',
+			'url_template' => 'https://claude.ai/new?q=%s',
+			'launch_mode'  => 'prefill',
+			'copy_notice'  => 'Prompt copied for Claude. Paste with Ctrl+V if needed.',
+		),
+		array(
+			'label'        => 'Gemini',
+			'icon'         => $icons_base . 'gemini.svg',
+			'url_template' => 'https://gemini.google.com/app',
+			'launch_mode'  => 'clipboard_modal',
+			'copy_notice'  => 'Prompt copied for Gemini. Open the chat box and paste with Ctrl+V.',
+		),
+		array(
+			'label'        => 'Perplexity',
+			'icon'         => $icons_base . 'perplexity.svg',
+			'url_template' => 'https://www.perplexity.ai/search/new?q=%s',
+			'launch_mode'  => 'prefill',
+			'copy_notice'  => 'Prompt copied for Perplexity. Paste with Ctrl+V if needed.',
+		),
+		array(
+			'label'        => 'Groq',
+			'icon'         => '',
+			'badge_text'   => 'groq',
+			'url_template' => 'https://chat.groq.com/',
+			'launch_mode'  => 'clipboard_modal',
+			'copy_notice'  => 'Prompt copied for Groq. Paste with Ctrl+V in the chat input.',
+		),
+	);
+}
+
+/**
+ * Resolve AI tool links from one shared configuration.
+ *
+ * @param string $icons_base Base URL for tool icons.
+ * @param string $prompt     Prepared article prompt.
+ * @return array<int, array<string, string>>
+ */
+function dhf_prepare_article_ai_tools( $icons_base, $prompt ) {
+	$prompt_url = rawurlencode( $prompt );
+	$tools      = array();
+
+	foreach ( dhf_get_article_ai_tool_definitions( $icons_base ) as $tool ) {
+		$tool['url'] = false !== strpos( $tool['url_template'], '%s' )
+			? sprintf( $tool['url_template'], $prompt_url )
+			: $tool['url_template'];
+
+		$tools[] = $tool;
+	}
+
+	return $tools;
+}
+
+/**
+ * Build a structured AI prompt from the current article.
+ *
+ * @param int    $post_id Current post ID.
+ * @param string $content Article HTML.
+ * @return string
+ */
+function dhf_build_article_prompt( $post_id, $content ) {
+	$context  = dhf_get_article_prompt_context( $post_id, $content );
+	$sections = dhf_get_article_prompt_sections( $context );
 
 	return implode( "\n\n", $sections );
 }
@@ -201,38 +300,11 @@ function dhf_append_article_tools( $content ) {
 	$post_url   = get_permalink( $post_id );
 	$post_title = wp_strip_all_tags( get_the_title( $post_id ) );
 	$prompt     = dhf_build_article_prompt( $post_id, $content );
-	$prompt_url = rawurlencode( $prompt );
 	$icons_base = trailingslashit( get_stylesheet_directory_uri() ) . 'assets/images/ai-icons/';
+	$ai_tools   = dhf_prepare_article_ai_tools( $icons_base, $prompt );
+	$instruction_graphic = trailingslashit( get_stylesheet_directory_uri() ) . 'nstrukcja.png';
 
 	$rendered_posts[] = $post_id;
-
-	$ai_tools = array(
-		array(
-			'label' => 'ChatGPT',
-			'icon'  => $icons_base . 'gpt.svg',
-			'url'   => 'https://chatgpt.com/?hints=search&prompt=' . $prompt_url,
-		),
-		array(
-			'label' => 'Claude',
-			'icon'  => $icons_base . 'claude.svg',
-			'url'   => 'https://claude.ai/new?q=' . $prompt_url,
-		),
-		array(
-			'label' => 'Gemini',
-			'icon'  => $icons_base . 'gemini.svg',
-			'url'   => 'https://gemini.google.com/app',
-		),
-		array(
-			'label' => 'Perplexity',
-			'icon'  => $icons_base . 'perplexity.svg',
-			'url'   => 'https://www.perplexity.ai/search/new?q=' . $prompt_url,
-		),
-		array(
-			'label' => 'Grok',
-			'icon'  => $icons_base . 'grok.svg',
-			'url'   => 'https://grok.com/',
-		),
-	);
 
 	$share_links = array(
 		array(
@@ -262,7 +334,7 @@ function dhf_append_article_tools( $content ) {
 		data-title="<?php echo esc_attr( $post_title ); ?>"
 	>
 		<div class="dhf-article-tools__group">
-			<p class="dhf-article-tools__label">Zaplanuj z AI:</p>
+			<p class="dhf-article-tools__label">Plan with AI:</p>
 			<div class="dhf-article-tools__actions" aria-label="AI summary tools">
 				<?php foreach ( $ai_tools as $tool ) : ?>
 					<a
@@ -272,21 +344,27 @@ function dhf_append_article_tools( $content ) {
 						rel="noopener noreferrer"
 						data-ai-tool
 						data-ai-label="<?php echo esc_attr( $tool['label'] ); ?>"
+						data-ai-launch-mode="<?php echo esc_attr( $tool['launch_mode'] ); ?>"
+						data-ai-copy-notice="<?php echo esc_attr( $tool['copy_notice'] ); ?>"
 					>
 						<span class="dhf-article-tools__badge" aria-hidden="true">
-							<img
-								class="dhf-article-tools__icon"
-								src="<?php echo esc_url( $tool['icon'] ); ?>"
-								alt=""
-								loading="lazy"
-								decoding="async"
-							/>
+							<?php if ( ! empty( $tool['icon'] ) ) : ?>
+								<img
+									class="dhf-article-tools__icon"
+									src="<?php echo esc_url( $tool['icon'] ); ?>"
+									alt=""
+									loading="lazy"
+									decoding="async"
+								/>
+							<?php elseif ( ! empty( $tool['badge_text'] ) ) : ?>
+								<span class="dhf-article-tools__icon-text"><?php echo esc_html( $tool['badge_text'] ); ?></span>
+							<?php endif; ?>
 						</span>
 						<span class="screen-reader-text"><?php echo esc_html( $tool['label'] ); ?></span>
 					</a>
 				<?php endforeach; ?>
 			</div>
-			<p class="dhf-article-tools__hint">Kliknij ikonę, aby otworzyć AI z gotowym zadaniem: stwórz trasę zwiedzania inspirowaną tym artykułem i podpowiedz, co zobaczyć, gdzie napić się kawy, kupić pamiątkę i zjeść obiad. Jeśli pole promptu nie uzupełni się samo, użyj Ctrl+V.</p>
+			<p class="dhf-article-tools__hint">Click an icon to open AI with a ready task. The article content is included as reference material. ChatGPT, Claude, and Perplexity use a prompt link, while Gemini and Groq open chat with the prompt copied to your clipboard.</p>
 		</div>
 		<div class="dhf-article-tools__group dhf-article-tools__group--share">
 			<p class="dhf-article-tools__label">Share:</p>
@@ -309,6 +387,48 @@ function dhf_append_article_tools( $content ) {
 			</div>
 		</div>
 		<div class="dhf-article-tools__toast" aria-live="polite" data-ai-toast hidden></div>
+		<div class="dhf-ai-modal" data-ai-modal hidden>
+			<div class="dhf-ai-modal__backdrop" data-ai-modal-close></div>
+			<div
+				class="dhf-ai-modal__dialog"
+				role="dialog"
+				aria-modal="true"
+				aria-labelledby="dhf-ai-modal-title-<?php echo esc_attr( $post_id ); ?>"
+			>
+				<button class="dhf-ai-modal__close" type="button" data-ai-modal-close aria-label="Close instructions">
+					<span aria-hidden="true">x</span>
+				</button>
+				<p class="dhf-ai-modal__eyebrow">Clipboard flow</p>
+				<h3 class="dhf-ai-modal__title" id="dhf-ai-modal-title-<?php echo esc_attr( $post_id ); ?>" data-ai-modal-title>
+					Finish in Gemini
+				</h3>
+				<p class="dhf-ai-modal__copy">
+					Your prompt is already in the clipboard. Follow these steps to continue in <span data-ai-modal-tool-name>Gemini</span>.
+				</p>
+				<figure class="dhf-ai-modal__graphic">
+					<img
+						class="dhf-ai-modal__graphic-image"
+						src="<?php echo esc_url( $instruction_graphic ); ?>"
+						alt="Three steps: prompt copied, open chat, paste with Ctrl plus V."
+						loading="lazy"
+						decoding="async"
+					/>
+				</figure>
+				<ol class="dhf-ai-modal__steps">
+					<li>Open <span data-ai-modal-tool-name>Gemini</span> in a new tab.</li>
+					<li>Click the chat input field.</li>
+					<li>Paste the copied prompt with <strong>Ctrl+V</strong>.</li>
+				</ol>
+				<div class="dhf-ai-modal__actions">
+					<button class="dhf-ai-modal__button dhf-ai-modal__button--primary" type="button" data-ai-modal-open>
+						Open <span data-ai-modal-tool-name>Gemini</span>
+					</button>
+					<button class="dhf-ai-modal__button dhf-ai-modal__button--secondary" type="button" data-ai-modal-copy>
+						Copy prompt again
+					</button>
+				</div>
+			</div>
+		</div>
 	</section>
 	<?php
 
