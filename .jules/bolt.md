@@ -1,0 +1,3 @@
+## 2024-03-24 - Layout Thrashing in Mouse Tracking Animations
+**Learning:** Custom mouse-tracking animations (like variable font width changes based on pointer position) were triggering layout thrashing by calling `getBoundingClientRect()` on every `pointermove` event. This is a codebase-specific anti-pattern because the element being measured doesn't move during the interaction.
+**Action:** When creating pointer-tracking effects, cache static measurements on `pointerenter` and clear them on `pointerleave`. Only read layout dimensions during `pointermove` if the element itself is moving or resizing during the hover state.
