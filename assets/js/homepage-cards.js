@@ -37,8 +37,11 @@
 		}
 	};
 
+	// Cache the bounding rect to prevent layout thrashing on every pointermove event
+	var cachedHeroRect = null;
+
 	var updateHeroWidth = function (clientX) {
-		var rect = heroArea.getBoundingClientRect();
+		var rect = cachedHeroRect || heroArea.getBoundingClientRect();
 		var centerX = rect.left + rect.width / 2;
 		var distance = Math.min(
 			Math.abs(clientX - centerX) / (rect.width / 2 || 1),
@@ -51,6 +54,7 @@
 
 	if (heroArea && heroHeading && finePointer && !reduceMotion) {
 		heroArea.addEventListener("pointerenter", function (event) {
+			cachedHeroRect = heroArea.getBoundingClientRect();
 			updateHeroWidth(event.clientX);
 		});
 
@@ -59,6 +63,7 @@
 		});
 
 		heroArea.addEventListener("pointerleave", function () {
+			cachedHeroRect = null;
 			heroTarget = 100;
 			queueHeroWidth();
 		});
