@@ -14,6 +14,7 @@
 	var heroFrame = 0;
 	var heroCurrent = 100;
 	var heroTarget = 100;
+	var heroRect = null; // Cache to avoid layout thrashing during pointermove
 
 	var renderHeroWidth = function () {
 		heroCurrent += (heroTarget - heroCurrent) * 0.16;
@@ -38,7 +39,7 @@
 	};
 
 	var updateHeroWidth = function (clientX) {
-		var rect = heroArea.getBoundingClientRect();
+		var rect = heroRect || heroArea.getBoundingClientRect();
 		var centerX = rect.left + rect.width / 2;
 		var distance = Math.min(
 			Math.abs(clientX - centerX) / (rect.width / 2 || 1),
@@ -51,6 +52,7 @@
 
 	if (heroArea && heroHeading && finePointer && !reduceMotion) {
 		heroArea.addEventListener("pointerenter", function (event) {
+			heroRect = heroArea.getBoundingClientRect();
 			updateHeroWidth(event.clientX);
 		});
 
@@ -59,6 +61,7 @@
 		});
 
 		heroArea.addEventListener("pointerleave", function () {
+			heroRect = null; // Clear cache
 			heroTarget = 100;
 			queueHeroWidth();
 		});

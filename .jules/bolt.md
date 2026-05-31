@@ -1,0 +1,3 @@
+## 2024-05-31 - [Avoid Layout Thrashing on Pointermove]
+**Learning:** Calling `getBoundingClientRect()` on every `pointermove` event causes significant layout thrashing on the main thread, acting as a performance bottleneck during hover interactions.
+**Action:** Always cache expensive DOM reads like `getBoundingClientRect()` outside of high-frequency event handlers. In cases like hover effects, caching the layout values on `pointerenter` and resetting on `pointerleave` provides a measurable frame rate boost without losing layout correctness.
