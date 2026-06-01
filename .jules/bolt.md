@@ -1,0 +1,3 @@
+## 2024-06-01 - Prevented Layout Thrashing in `homepage-cards.js`
+**Learning:** This codebase had a `pointermove` event listener querying `getBoundingClientRect()` while simultaneously modifying CSS custom properties (`--dhf-hero-wdth`, `--dhf-hero-stretch`) in a `requestAnimationFrame` loop. This intertwining caused forced synchronous layout (layout thrashing) on nearly every mouse movement.
+**Action:** When animating elements based on pointer coordinates, always cache the bounding boxes on `pointerenter` and window `resize` events to avoid reading the DOM layout properties during the `pointermove` cycle, especially when the loop writes back to the DOM/CSSOM.
