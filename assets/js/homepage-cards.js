@@ -15,6 +15,17 @@
 	var heroCurrent = 100;
 	var heroTarget = 100;
 
+	// Cache dimensions to prevent layout thrashing on pointermove
+	var heroRect = null;
+	var heroCenterX = 0;
+
+	var updateHeroMetrics = function () {
+		if (heroArea) {
+			heroRect = heroArea.getBoundingClientRect();
+			heroCenterX = heroRect.left + heroRect.width / 2;
+		}
+	};
+
 	var renderHeroWidth = function () {
 		heroCurrent += (heroTarget - heroCurrent) * 0.16;
 		heroHeading.style.setProperty("--dhf-hero-wdth", heroCurrent.toFixed(2));
@@ -38,10 +49,9 @@
 	};
 
 	var updateHeroWidth = function (clientX) {
-		var rect = heroArea.getBoundingClientRect();
-		var centerX = rect.left + rect.width / 2;
+		if (!heroRect) return;
 		var distance = Math.min(
-			Math.abs(clientX - centerX) / (rect.width / 2 || 1),
+			Math.abs(clientX - heroCenterX) / (heroRect.width / 2 || 1),
 			1
 		);
 
@@ -50,7 +60,10 @@
 	};
 
 	if (heroArea && heroHeading && finePointer && !reduceMotion) {
+		window.addEventListener("resize", updateHeroMetrics, { passive: true });
+
 		heroArea.addEventListener("pointerenter", function (event) {
+			updateHeroMetrics(); // Refresh on enter in case layout changed
 			updateHeroWidth(event.clientX);
 		});
 
