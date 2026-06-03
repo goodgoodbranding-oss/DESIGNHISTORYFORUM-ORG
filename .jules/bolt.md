@@ -1,0 +1,3 @@
+## 2024-06-03 - [Preventing Layout Thrashing in Pointer Event Listeners]
+**Learning:** Concurrent `requestAnimationFrame` style mutations (e.g. changing `--dhf-hero-wdth` and `--dhf-hero-stretch`) and high-frequency `pointermove` event handlers that perform layout reads (e.g. `getBoundingClientRect()`) cause severe layout thrashing. The browser is forced to synchronously recalculate layout on every mouse movement because the `rAF` loop is invalidating the layout.
+**Action:** When creating high-frequency event handlers (like `pointermove` or `scroll`), always decouple layout reads from style mutations. Cache bounding boxes on setup, `resize`, or enter events (like `pointerenter`), and only use the cached values within the high-frequency handler.
