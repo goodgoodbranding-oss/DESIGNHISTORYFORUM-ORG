@@ -14,6 +14,8 @@
 	var heroFrame = 0;
 	var heroCurrent = 100;
 	var heroTarget = 100;
+	var heroRect = null;
+	var heroCenterX = 0;
 
 	var renderHeroWidth = function () {
 		heroCurrent += (heroTarget - heroCurrent) * 0.16;
@@ -38,10 +40,14 @@
 	};
 
 	var updateHeroWidth = function (clientX) {
-		var rect = heroArea.getBoundingClientRect();
-		var centerX = rect.left + rect.width / 2;
+		// ⚡ Bolt: Cache bounding box to prevent layout thrashing
+		if (!heroRect) {
+			heroRect = heroArea.getBoundingClientRect();
+			heroCenterX = heroRect.left + heroRect.width / 2;
+		}
+
 		var distance = Math.min(
-			Math.abs(clientX - centerX) / (rect.width / 2 || 1),
+			Math.abs(clientX - heroCenterX) / (heroRect.width / 2 || 1),
 			1
 		);
 
@@ -51,6 +57,7 @@
 
 	if (heroArea && heroHeading && finePointer && !reduceMotion) {
 		heroArea.addEventListener("pointerenter", function (event) {
+			heroRect = null; // Invalidate cache on enter
 			updateHeroWidth(event.clientX);
 		});
 
@@ -60,7 +67,12 @@
 
 		heroArea.addEventListener("pointerleave", function () {
 			heroTarget = 100;
+			heroRect = null; // Clear cache on leave
 			queueHeroWidth();
+		});
+
+		window.addEventListener("resize", function () {
+			heroRect = null; // Clear cache on resize
 		});
 	}
 
