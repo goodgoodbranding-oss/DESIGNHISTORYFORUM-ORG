@@ -14,6 +14,7 @@
 	var heroFrame = 0;
 	var heroCurrent = 100;
 	var heroTarget = 100;
+	var heroRect = null; // Cache for performance
 
 	var renderHeroWidth = function () {
 		heroCurrent += (heroTarget - heroCurrent) * 0.16;
@@ -37,11 +38,20 @@
 		}
 	};
 
-	var updateHeroWidth = function (clientX) {
-		var rect = heroArea.getBoundingClientRect();
-		var centerX = rect.left + rect.width / 2;
+	var updateHeroWidth = function (pageX) {
+		// Cache bounding rect to prevent layout thrashing
+		if (!heroRect) {
+			var rect = heroArea.getBoundingClientRect();
+			heroRect = {
+				left: rect.left + window.scrollX,
+				width: rect.width
+			};
+		}
+
+		// Use document-relative coordinates to handle scrolling without recalculating layout
+		var centerX = heroRect.left + heroRect.width / 2;
 		var distance = Math.min(
-			Math.abs(clientX - centerX) / (rect.width / 2 || 1),
+			Math.abs(pageX - centerX) / (heroRect.width / 2 || 1),
 			1
 		);
 
@@ -50,12 +60,17 @@
 	};
 
 	if (heroArea && heroHeading && finePointer && !reduceMotion) {
+		window.addEventListener("resize", function () {
+			heroRect = null; // Invalidate cache on resize
+		});
+
 		heroArea.addEventListener("pointerenter", function (event) {
-			updateHeroWidth(event.clientX);
+			heroRect = null; // Invalidate cache on enter to ensure accuracy
+			updateHeroWidth(event.pageX);
 		});
 
 		heroArea.addEventListener("pointermove", function (event) {
-			updateHeroWidth(event.clientX);
+			updateHeroWidth(event.pageX);
 		});
 
 		heroArea.addEventListener("pointerleave", function () {
