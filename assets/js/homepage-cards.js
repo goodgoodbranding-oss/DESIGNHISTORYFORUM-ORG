@@ -14,6 +14,8 @@
 	var heroFrame = 0;
 	var heroCurrent = 100;
 	var heroTarget = 100;
+	var cachedCenterX = null;
+	var cachedHalfWidth = null;
 
 	var renderHeroWidth = function () {
 		heroCurrent += (heroTarget - heroCurrent) * 0.16;
@@ -38,10 +40,15 @@
 	};
 
 	var updateHeroWidth = function (clientX) {
-		var rect = heroArea.getBoundingClientRect();
-		var centerX = rect.left + rect.width / 2;
+		// ⚡ Bolt: Cache layout geometry to prevent layout thrashing on rapid pointermove events
+		if (cachedCenterX === null || cachedHalfWidth === null) {
+			var rect = heroArea.getBoundingClientRect();
+			cachedHalfWidth = rect.width / 2 || 1;
+			cachedCenterX = rect.left + cachedHalfWidth;
+		}
+
 		var distance = Math.min(
-			Math.abs(clientX - centerX) / (rect.width / 2 || 1),
+			Math.abs(clientX - cachedCenterX) / cachedHalfWidth,
 			1
 		);
 
@@ -51,6 +58,8 @@
 
 	if (heroArea && heroHeading && finePointer && !reduceMotion) {
 		heroArea.addEventListener("pointerenter", function (event) {
+			cachedCenterX = null;
+			cachedHalfWidth = null;
 			updateHeroWidth(event.clientX);
 		});
 
@@ -59,8 +68,15 @@
 		});
 
 		heroArea.addEventListener("pointerleave", function () {
+			cachedCenterX = null;
+			cachedHalfWidth = null;
 			heroTarget = 100;
 			queueHeroWidth();
+		});
+
+		window.addEventListener("resize", function () {
+			cachedCenterX = null;
+			cachedHalfWidth = null;
 		});
 	}
 
