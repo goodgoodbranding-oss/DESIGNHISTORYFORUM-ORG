@@ -14,6 +14,7 @@
 	var heroFrame = 0;
 	var heroCurrent = 100;
 	var heroTarget = 100;
+	var heroRect = null; // ⚡ Bolt: Cache bounding rect to prevent layout thrashing on pointermove
 
 	var renderHeroWidth = function () {
 		heroCurrent += (heroTarget - heroCurrent) * 0.16;
@@ -38,10 +39,12 @@
 	};
 
 	var updateHeroWidth = function (clientX) {
-		var rect = heroArea.getBoundingClientRect();
-		var centerX = rect.left + rect.width / 2;
+		if (!heroRect) {
+			heroRect = heroArea.getBoundingClientRect();
+		}
+		var centerX = heroRect.left + heroRect.width / 2;
 		var distance = Math.min(
-			Math.abs(clientX - centerX) / (rect.width / 2 || 1),
+			Math.abs(clientX - centerX) / (heroRect.width / 2 || 1),
 			1
 		);
 
@@ -50,7 +53,15 @@
 	};
 
 	if (heroArea && heroHeading && finePointer && !reduceMotion) {
+		// ⚡ Bolt: Update cached rect on resize and scroll
+		var updateHeroRect = function () {
+			heroRect = heroArea.getBoundingClientRect();
+		};
+		window.addEventListener("resize", updateHeroRect, { passive: true });
+		window.addEventListener("scroll", updateHeroRect, { passive: true });
+
 		heroArea.addEventListener("pointerenter", function (event) {
+			updateHeroRect();
 			updateHeroWidth(event.clientX);
 		});
 
