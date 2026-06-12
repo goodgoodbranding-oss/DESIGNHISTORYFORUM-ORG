@@ -14,6 +14,8 @@
 	var heroFrame = 0;
 	var heroCurrent = 100;
 	var heroTarget = 100;
+	var heroCenterX = 0;
+	var heroHalfWidth = 1;
 
 	var renderHeroWidth = function () {
 		heroCurrent += (heroTarget - heroCurrent) * 0.16;
@@ -38,10 +40,9 @@
 	};
 
 	var updateHeroWidth = function (clientX) {
-		var rect = heroArea.getBoundingClientRect();
-		var centerX = rect.left + rect.width / 2;
+		// Use cached dimensions to prevent layout thrashing
 		var distance = Math.min(
-			Math.abs(clientX - centerX) / (rect.width / 2 || 1),
+			Math.abs(clientX - heroCenterX) / heroHalfWidth,
 			1
 		);
 
@@ -51,6 +52,10 @@
 
 	if (heroArea && heroHeading && finePointer && !reduceMotion) {
 		heroArea.addEventListener("pointerenter", function (event) {
+			// Cache metrics on enter to prevent layout thrashing on move
+			var rect = heroArea.getBoundingClientRect();
+			heroHalfWidth = rect.width / 2 || 1;
+			heroCenterX = rect.left + heroHalfWidth;
 			updateHeroWidth(event.clientX);
 		});
 
