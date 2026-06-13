@@ -14,6 +14,7 @@
 	var heroFrame = 0;
 	var heroCurrent = 100;
 	var heroTarget = 100;
+	var cachedHeroRect = null;
 
 	var renderHeroWidth = function () {
 		heroCurrent += (heroTarget - heroCurrent) * 0.16;
@@ -38,7 +39,13 @@
 	};
 
 	var updateHeroWidth = function (clientX) {
-		var rect = heroArea.getBoundingClientRect();
+		// Cache getBoundingClientRect() to avoid synchronous layout thrashing (forced reflow)
+		// during high-frequency pointermove events while CSS properties are animated.
+		if (!cachedHeroRect) {
+			cachedHeroRect = heroArea.getBoundingClientRect();
+		}
+
+		var rect = cachedHeroRect;
 		var centerX = rect.left + rect.width / 2;
 		var distance = Math.min(
 			Math.abs(clientX - centerX) / (rect.width / 2 || 1),
@@ -60,8 +67,17 @@
 
 		heroArea.addEventListener("pointerleave", function () {
 			heroTarget = 100;
+			cachedHeroRect = null; // Invalidate cache
 			queueHeroWidth();
 		});
+
+		window.addEventListener("resize", function () {
+			cachedHeroRect = null; // Invalidate cache on resize
+		});
+
+		window.addEventListener("scroll", function () {
+			cachedHeroRect = null; // Invalidate cache on scroll
+		}, { passive: true });
 	}
 
 	if (!cards.length) {
