@@ -1,0 +1,3 @@
+## 2024-06-25 - Prevent Layout Thrashing in Animation Loops
+**Learning:** Calling `getBoundingClientRect()` within a `pointermove` event handler that simultaneously updates animated CSS variables causes severe synchronous layout thrashing (forced reflow) up to 60 times per second, hurting UI performance.
+**Action:** Cache the result of `getBoundingClientRect()` at the start of the interaction (e.g., `pointerenter` or initial `pointermove`) and reuse it during the continuous updates. Invalidate the cache when the interaction ends (e.g., `pointerleave`) or on window `resize` to ensure correctness without sacrificing performance.
