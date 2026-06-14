@@ -14,6 +14,7 @@
 	var heroFrame = 0;
 	var heroCurrent = 100;
 	var heroTarget = 100;
+	var heroRect = null; // ⚡ Bolt: Cache hero metrics to avoid layout thrashing on pointermove
 
 	var renderHeroWidth = function () {
 		heroCurrent += (heroTarget - heroCurrent) * 0.16;
@@ -38,10 +39,13 @@
 	};
 
 	var updateHeroWidth = function (clientX) {
-		var rect = heroArea.getBoundingClientRect();
-		var centerX = rect.left + rect.width / 2;
+		if (!heroRect) {
+			heroRect = heroArea.getBoundingClientRect();
+		}
+
+		var centerX = heroRect.left + heroRect.width / 2;
 		var distance = Math.min(
-			Math.abs(clientX - centerX) / (rect.width / 2 || 1),
+			Math.abs(clientX - centerX) / (heroRect.width / 2 || 1),
 			1
 		);
 
@@ -51,6 +55,9 @@
 
 	if (heroArea && heroHeading && finePointer && !reduceMotion) {
 		heroArea.addEventListener("pointerenter", function (event) {
+			// Update cached rect when entering to ensure it's accurate
+			// even if window was resized or scrolled since last interaction
+			heroRect = heroArea.getBoundingClientRect();
 			updateHeroWidth(event.clientX);
 		});
 
@@ -60,6 +67,7 @@
 
 		heroArea.addEventListener("pointerleave", function () {
 			heroTarget = 100;
+			heroRect = null; // Clear cache to avoid stale layout
 			queueHeroWidth();
 		});
 	}
