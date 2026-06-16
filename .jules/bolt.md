@@ -1,0 +1,3 @@
+## 2026-06-16 - [Layout Thrashing in RequestAnimationFrame Loops]
+**Learning:** The application was recalculating layout properties (`getBoundingClientRect()`) on every `pointermove` event while concurrently updating CSS variables during a `requestAnimationFrame` loop. This is a classic layout thrashing pattern that causes unnecessary style recalculations and significantly reduces performance by blocking the main thread.
+**Action:** Ensure layout metrics that do not frequently change (like a container's size and position) are cached on enter events (e.g., `pointerenter`) and used in high-frequency event handlers (e.g., `pointermove`) rather than queried synchronously from the DOM. Clear the cache on leave events.
