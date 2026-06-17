@@ -71,7 +71,14 @@ add_action( 'wp_enqueue_scripts', 'dhf_kadence_child_enqueue_styles' );
  * @return string
  */
 function dhf_normalize_prompt_text( $text ) {
-	$text = html_entity_decode( wp_strip_all_tags( (string) $text ), ENT_QUOTES, get_bloginfo( 'charset' ) );
+	// ⚡ Bolt: statically cache charset to avoid repeated get_bloginfo() calls on every string normalization
+	static $charset = null;
+
+	if ( null === $charset ) {
+		$charset = get_bloginfo( 'charset' );
+	}
+
+	$text = html_entity_decode( wp_strip_all_tags( (string) $text ), ENT_QUOTES, $charset );
 	$text = preg_replace( '/\s+/u', ' ', trim( $text ) );
 
 	return is_string( $text ) ? $text : '';
@@ -119,8 +126,9 @@ function dhf_get_article_prompt_context( $post_id, $content ) {
 	$categories = wp_get_post_terms( $post_id, 'category', array( 'fields' => 'names' ) );
 	$tags       = wp_get_post_terms( $post_id, 'post_tag', array( 'fields' => 'names' ) );
 	$lead       = has_excerpt( $post_id ) ? get_the_excerpt( $post_id ) : $content;
-	$lead       = wp_trim_words( dhf_normalize_prompt_text( $lead ), 55, '...' );
-	$body       = wp_trim_words( dhf_normalize_prompt_text( $content ), 220, '...' );
+	// ⚡ Bolt: trim HTML first (O(words)) before expensive normalization instead of normalizing whole text (O(bytes))
+	$lead       = dhf_normalize_prompt_text( wp_trim_words( $lead, 55, '...' ) );
+	$body       = dhf_normalize_prompt_text( wp_trim_words( $content, 220, '...' ) );
 	$headings   = dhf_extract_article_headings( $content );
 
 	return array(
