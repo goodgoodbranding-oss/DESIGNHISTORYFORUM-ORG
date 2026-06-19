@@ -14,6 +14,7 @@
 	var heroFrame = 0;
 	var heroCurrent = 100;
 	var heroTarget = 100;
+	var cachedHeroRect = null;
 
 	var renderHeroWidth = function () {
 		heroCurrent += (heroTarget - heroCurrent) * 0.16;
@@ -38,7 +39,11 @@
 	};
 
 	var updateHeroWidth = function (clientX) {
-		var rect = heroArea.getBoundingClientRect();
+		if (!cachedHeroRect) {
+			cachedHeroRect = heroArea.getBoundingClientRect();
+		}
+
+		var rect = cachedHeroRect;
 		var centerX = rect.left + rect.width / 2;
 		var distance = Math.min(
 			Math.abs(clientX - centerX) / (rect.width / 2 || 1),
@@ -50,18 +55,32 @@
 	};
 
 	if (heroArea && heroHeading && finePointer && !reduceMotion) {
+		// Cache layout measurements on pointer enter
 		heroArea.addEventListener("pointerenter", function (event) {
+			cachedHeroRect = heroArea.getBoundingClientRect();
 			updateHeroWidth(event.clientX);
-		});
+		}, { passive: true });
 
+		// Use cached measurements on high-frequency pointermove
 		heroArea.addEventListener("pointermove", function (event) {
 			updateHeroWidth(event.clientX);
-		});
+		}, { passive: true });
 
 		heroArea.addEventListener("pointerleave", function () {
 			heroTarget = 100;
+			cachedHeroRect = null;
 			queueHeroWidth();
-		});
+		}, { passive: true });
+
+		// Clear cache if the user scrolls
+		window.addEventListener("scroll", function () {
+			cachedHeroRect = null;
+		}, { passive: true });
+
+		// Clear cache if window resizes
+		window.addEventListener("resize", function () {
+			cachedHeroRect = null;
+		}, { passive: true });
 	}
 
 	if (!cards.length) {
