@@ -37,11 +37,19 @@
 		}
 	};
 
+	// ⚡ Bolt: Cache bounding rect to prevent layout thrashing during pointermove
+	var cachedCenterX = null;
+	var cachedHalfWidth = 1;
+
 	var updateHeroWidth = function (clientX) {
-		var rect = heroArea.getBoundingClientRect();
-		var centerX = rect.left + rect.width / 2;
+		if (cachedCenterX === null) {
+			var rect = heroArea.getBoundingClientRect();
+			cachedHalfWidth = rect.width / 2 || 1;
+			cachedCenterX = rect.left + cachedHalfWidth;
+		}
+
 		var distance = Math.min(
-			Math.abs(clientX - centerX) / (rect.width / 2 || 1),
+			Math.abs(clientX - cachedCenterX) / cachedHalfWidth,
 			1
 		);
 
@@ -51,6 +59,7 @@
 
 	if (heroArea && heroHeading && finePointer && !reduceMotion) {
 		heroArea.addEventListener("pointerenter", function (event) {
+			cachedCenterX = null;
 			updateHeroWidth(event.clientX);
 		});
 
@@ -59,6 +68,7 @@
 		});
 
 		heroArea.addEventListener("pointerleave", function () {
+			cachedCenterX = null;
 			heroTarget = 100;
 			queueHeroWidth();
 		});
