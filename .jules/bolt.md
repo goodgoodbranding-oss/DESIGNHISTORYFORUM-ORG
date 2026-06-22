@@ -1,0 +1,3 @@
+## 2024-10-24 - Layout Thrashing in Continuous Interactions
+**Learning:** Found an instance in `assets/js/homepage-cards.js` where `getBoundingClientRect()` was being called on every `pointermove` event (dozens of times per second). Querying layout properties continuously on fast-firing events forces synchronous style recalculations and severely impacts performance, causing layout thrashing.
+**Action:** When adding listeners to continuous events like `pointermove`, `mousemove`, `scroll`, or `touchmove`, always inspect the callback for DOM measuring functions. Cache the dimensions on `pointerenter` or similar lifecycle events, and selectively invalidate the cache using passive listeners for `scroll` and `resize`.
