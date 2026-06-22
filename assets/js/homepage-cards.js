@@ -37,11 +37,17 @@
 		}
 	};
 
+	// ⚡ Bolt: Cache DOM rect to prevent layout thrashing on pointermove
+	var cachedHeroRect = null;
+
 	var updateHeroWidth = function (clientX) {
-		var rect = heroArea.getBoundingClientRect();
-		var centerX = rect.left + rect.width / 2;
+		if (!cachedHeroRect) {
+			cachedHeroRect = heroArea.getBoundingClientRect();
+		}
+
+		var centerX = cachedHeroRect.left + cachedHeroRect.width / 2;
 		var distance = Math.min(
-			Math.abs(clientX - centerX) / (rect.width / 2 || 1),
+			Math.abs(clientX - centerX) / (cachedHeroRect.width / 2 || 1),
 			1
 		);
 
@@ -51,6 +57,7 @@
 
 	if (heroArea && heroHeading && finePointer && !reduceMotion) {
 		heroArea.addEventListener("pointerenter", function (event) {
+			cachedHeroRect = heroArea.getBoundingClientRect();
 			updateHeroWidth(event.clientX);
 		});
 
@@ -62,6 +69,14 @@
 			heroTarget = 100;
 			queueHeroWidth();
 		});
+
+		window.addEventListener("resize", function () {
+			cachedHeroRect = null;
+		}, { passive: true });
+
+		window.addEventListener("scroll", function () {
+			cachedHeroRect = null;
+		}, { passive: true });
 	}
 
 	if (!cards.length) {
