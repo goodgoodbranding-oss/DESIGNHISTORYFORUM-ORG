@@ -14,6 +14,7 @@
 	var heroFrame = 0;
 	var heroCurrent = 100;
 	var heroTarget = 100;
+	var heroRectCache = null;
 
 	var renderHeroWidth = function () {
 		heroCurrent += (heroTarget - heroCurrent) * 0.16;
@@ -38,7 +39,12 @@
 	};
 
 	var updateHeroWidth = function (clientX) {
-		var rect = heroArea.getBoundingClientRect();
+		// Use cached rect to prevent layout thrashing, fallback to calculating if null
+		var rect = heroRectCache || heroArea.getBoundingClientRect();
+		if (!heroRectCache) {
+			heroRectCache = rect;
+		}
+
 		var centerX = rect.left + rect.width / 2;
 		var distance = Math.min(
 			Math.abs(clientX - centerX) / (rect.width / 2 || 1),
@@ -51,6 +57,7 @@
 
 	if (heroArea && heroHeading && finePointer && !reduceMotion) {
 		heroArea.addEventListener("pointerenter", function (event) {
+			heroRectCache = heroArea.getBoundingClientRect();
 			updateHeroWidth(event.clientX);
 		});
 
@@ -60,7 +67,14 @@
 
 		heroArea.addEventListener("pointerleave", function () {
 			heroTarget = 100;
+			heroRectCache = null; // Clear cache
 			queueHeroWidth();
+		});
+
+		window.addEventListener("resize", function () {
+			if (heroRectCache) {
+				heroRectCache = heroArea.getBoundingClientRect();
+			}
 		});
 	}
 
