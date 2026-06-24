@@ -15,6 +15,15 @@
 	var heroCurrent = 100;
 	var heroTarget = 100;
 
+	// Cache the hero area dimensions to prevent layout thrashing
+	// `getBoundingClientRect` inside pointermove forces synchronous layout recalculations
+	var cachedRect = null;
+	var updateCachedRect = function () {
+		if (heroArea) {
+			cachedRect = heroArea.getBoundingClientRect();
+		}
+	};
+
 	var renderHeroWidth = function () {
 		heroCurrent += (heroTarget - heroCurrent) * 0.16;
 		heroHeading.style.setProperty("--dhf-hero-wdth", heroCurrent.toFixed(2));
@@ -38,10 +47,11 @@
 	};
 
 	var updateHeroWidth = function (clientX) {
-		var rect = heroArea.getBoundingClientRect();
-		var centerX = rect.left + rect.width / 2;
+		if (!cachedRect) return;
+
+		var centerX = cachedRect.left + cachedRect.width / 2;
 		var distance = Math.min(
-			Math.abs(clientX - centerX) / (rect.width / 2 || 1),
+			Math.abs(clientX - centerX) / (cachedRect.width / 2 || 1),
 			1
 		);
 
@@ -50,9 +60,15 @@
 	};
 
 	if (heroArea && heroHeading && finePointer && !reduceMotion) {
+		// Initialize the rect on first enter
 		heroArea.addEventListener("pointerenter", function (event) {
+			updateCachedRect();
 			updateHeroWidth(event.clientX);
 		});
+
+		// Listen to resize and scroll to keep the cached rect accurate
+		window.addEventListener("resize", updateCachedRect, { passive: true });
+		window.addEventListener("scroll", updateCachedRect, { passive: true });
 
 		heroArea.addEventListener("pointermove", function (event) {
 			updateHeroWidth(event.clientX);
