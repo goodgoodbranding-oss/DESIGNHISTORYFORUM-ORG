@@ -1,0 +1,3 @@
+## 2023-10-27 - Layout thrashing in pointermove handlers
+**Learning:** Calling `getBoundingClientRect()` inside a highly frequent event handler like `pointermove` forces synchronous layout calculation, which can cause severe layout thrashing and drop frames, especially when paired with DOM updates or CSS variable updates (like `--dhf-hero-wdth` in this case).
+**Action:** Always cache dimensions (`getBoundingClientRect()`) outside of frequent event loops (like `pointermove` or `scroll`). Initialize the cache on `pointerenter` (or the start of the interaction) and invalidate it on `pointerleave` or window `resize`.
