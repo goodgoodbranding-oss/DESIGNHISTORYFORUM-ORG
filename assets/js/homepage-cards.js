@@ -14,6 +14,7 @@
 	var heroFrame = 0;
 	var heroCurrent = 100;
 	var heroTarget = 100;
+	var heroRect = null; // Cache to avoid layout thrashing on pointermove
 
 	var renderHeroWidth = function () {
 		heroCurrent += (heroTarget - heroCurrent) * 0.16;
@@ -38,10 +39,15 @@
 	};
 
 	var updateHeroWidth = function (clientX) {
-		var rect = heroArea.getBoundingClientRect();
-		var centerX = rect.left + rect.width / 2;
+		// Calculate and cache rect on first hover. Calling getBoundingClientRect
+		// on every pointermove forces synchronous layout calculation.
+		if (!heroRect) {
+			heroRect = heroArea.getBoundingClientRect();
+		}
+
+		var centerX = heroRect.left + heroRect.width / 2;
 		var distance = Math.min(
-			Math.abs(clientX - centerX) / (rect.width / 2 || 1),
+			Math.abs(clientX - centerX) / (heroRect.width / 2 || 1),
 			1
 		);
 
@@ -59,8 +65,13 @@
 		});
 
 		heroArea.addEventListener("pointerleave", function () {
+			heroRect = null;
 			heroTarget = 100;
 			queueHeroWidth();
+		});
+
+		window.addEventListener("resize", function () {
+			heroRect = null;
 		});
 	}
 
