@@ -14,6 +14,8 @@
 	var heroFrame = 0;
 	var heroCurrent = 100;
 	var heroTarget = 100;
+	// ⚡ Bolt: Cache hero area rect to prevent layout thrashing on pointermove.
+	var heroRect = null;
 
 	var renderHeroWidth = function () {
 		heroCurrent += (heroTarget - heroCurrent) * 0.16;
@@ -38,7 +40,8 @@
 	};
 
 	var updateHeroWidth = function (clientX) {
-		var rect = heroArea.getBoundingClientRect();
+		// ⚡ Bolt: Use cached rect when available to avoid synchronous layout reflows.
+		var rect = heroRect || heroArea.getBoundingClientRect();
 		var centerX = rect.left + rect.width / 2;
 		var distance = Math.min(
 			Math.abs(clientX - centerX) / (rect.width / 2 || 1),
@@ -51,6 +54,7 @@
 
 	if (heroArea && heroHeading && finePointer && !reduceMotion) {
 		heroArea.addEventListener("pointerenter", function (event) {
+			heroRect = heroArea.getBoundingClientRect();
 			updateHeroWidth(event.clientX);
 		});
 
@@ -60,6 +64,7 @@
 
 		heroArea.addEventListener("pointerleave", function () {
 			heroTarget = 100;
+			heroRect = null;
 			queueHeroWidth();
 		});
 	}
