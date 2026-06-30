@@ -1,0 +1,3 @@
+## 2024-06-30 - Layout Thrashing in pointermove Handlers
+**Learning:** Calling `getBoundingClientRect()` inside a frequent event listener (like `pointermove`) forces synchronous layout calculation. When combined with styles being updated concurrently via `requestAnimationFrame` (e.g. changing `--dhf-hero-wdth`), it causes severe layout thrashing and drops frames significantly below 60 FPS.
+**Action:** Always cache bounding boxes (`getBoundingClientRect()`) during less frequent events like `pointerenter` or window resize, and use `event.pageX` with document-relative coordinates instead of `event.clientX` to avoid recalculating layout on every frame.
