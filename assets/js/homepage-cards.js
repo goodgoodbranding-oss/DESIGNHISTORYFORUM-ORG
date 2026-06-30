@@ -14,6 +14,9 @@
 	var heroFrame = 0;
 	var heroCurrent = 100;
 	var heroTarget = 100;
+	// Cache the hero area dimensions to prevent layout thrashing
+	var cachedHeroCenterX = 0;
+	var cachedHeroHalfWidth = 1;
 
 	var renderHeroWidth = function () {
 		heroCurrent += (heroTarget - heroCurrent) * 0.16;
@@ -37,11 +40,10 @@
 		}
 	};
 
-	var updateHeroWidth = function (clientX) {
-		var rect = heroArea.getBoundingClientRect();
-		var centerX = rect.left + rect.width / 2;
+	var updateHeroWidth = function (pageX) {
+		// Use cached dimensions to avoid forcing synchronous layout in pointermove
 		var distance = Math.min(
-			Math.abs(clientX - centerX) / (rect.width / 2 || 1),
+			Math.abs(pageX - cachedHeroCenterX) / cachedHeroHalfWidth,
 			1
 		);
 
@@ -51,11 +53,16 @@
 
 	if (heroArea && heroHeading && finePointer && !reduceMotion) {
 		heroArea.addEventListener("pointerenter", function (event) {
-			updateHeroWidth(event.clientX);
+			// Cache position only on enter to prevent layout thrashing on move
+			var rect = heroArea.getBoundingClientRect();
+			cachedHeroHalfWidth = (rect.width / 2) || 1;
+			cachedHeroCenterX = rect.left + window.scrollX + cachedHeroHalfWidth;
+
+			updateHeroWidth(event.pageX);
 		});
 
 		heroArea.addEventListener("pointermove", function (event) {
-			updateHeroWidth(event.clientX);
+			updateHeroWidth(event.pageX);
 		});
 
 		heroArea.addEventListener("pointerleave", function () {
