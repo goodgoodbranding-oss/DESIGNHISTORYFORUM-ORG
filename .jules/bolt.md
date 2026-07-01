@@ -1,0 +1,3 @@
+## 2026-07-01 - Layout Thrashing in Pointer Events
+**Learning:** Calling `getBoundingClientRect()` inside a `pointermove` event listener causes synchronous layout calculations (layout thrashing) on every mouse movement, significantly degrading performance.
+**Action:** Cache the bounding rectangle on `pointerenter` (and update on `resize`) to avoid recalculating it during high-frequency events like `pointermove`. Clear the cache on `pointerleave`.
