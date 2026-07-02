@@ -1,0 +1,3 @@
+## 2024-05-24 - Prevent Layout Thrashing in Pointer Events
+**Learning:** Found layout thrashing in `assets/js/homepage-cards.js`. Reading `getBoundingClientRect()` inside a frequent `pointermove` event handler, while concurrently modifying inline styles (writing layout properties) via `requestAnimationFrame` in the same block, forces the browser to recalculate layouts synchronously, significantly harming frontend performance on interactive elements.
+**Action:** Cache the result of `getBoundingClientRect()` during the `pointerenter` event and reuse it during `pointermove`. Clear the cache on `pointerleave` and `resize` events to ensure it stays fresh when needed.
