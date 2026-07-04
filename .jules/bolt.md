@@ -1,0 +1,3 @@
+## 2024-07-04 - Cache bounding rect in layout-modifying pointer events
+**Learning:** Calling `getBoundingClientRect()` inside a `pointermove` event handler that simultaneously mutates layout-affecting CSS custom properties causes severe layout thrashing. The synchronous DOM read forces the browser to recalculate layout repeatedly on every tick of the pointer movement.
+**Action:** When a DOM read like `getBoundingClientRect()` doesn't change during the interaction, cache its result on `pointerenter` (or initial read) and invalidate on `resize` or `pointerleave`, instead of reading it inside the high-frequency `pointermove` loop.
