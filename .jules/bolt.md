@@ -1,0 +1,3 @@
+## 2024-05-15 - Layout thrashing during requestAnimationFrame
+**Learning:** Calling `getBoundingClientRect()` inside a high-frequency event like `pointermove` while simultaneously modifying CSS custom properties in a `requestAnimationFrame` loop causes synchronous layout thrashing (forced synchronous layout). The browser is forced to recalculate layout repeatedly because the DOM read (getBoundingClientRect) happens after DOM writes (CSS variable updates) in the animation loop frame cycle.
+**Action:** Always cache bounding rects for elements during interaction. Invalidate and re-read them only when necessary (e.g., `pointerenter`, `resize`, or scroll events) instead of on every `pointermove`.
