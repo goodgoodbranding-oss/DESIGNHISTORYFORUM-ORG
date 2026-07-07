@@ -15,6 +15,18 @@
 	var heroCurrent = 100;
 	var heroTarget = 100;
 
+	// ⚡ Bolt: Cache bounding box metrics to prevent layout thrashing.
+	// Calling getBoundingClientRect() inside pointermove while animating
+	// CSS properties forces synchronous layout recalculation.
+	var heroCenterX = 0;
+	var heroHalfWidth = 1;
+
+	var updateHeroMetrics = function () {
+		var rect = heroArea.getBoundingClientRect();
+		heroCenterX = rect.left + rect.width / 2;
+		heroHalfWidth = rect.width / 2 || 1;
+	};
+
 	var renderHeroWidth = function () {
 		heroCurrent += (heroTarget - heroCurrent) * 0.16;
 		heroHeading.style.setProperty("--dhf-hero-wdth", heroCurrent.toFixed(2));
@@ -38,10 +50,8 @@
 	};
 
 	var updateHeroWidth = function (clientX) {
-		var rect = heroArea.getBoundingClientRect();
-		var centerX = rect.left + rect.width / 2;
 		var distance = Math.min(
-			Math.abs(clientX - centerX) / (rect.width / 2 || 1),
+			Math.abs(clientX - heroCenterX) / heroHalfWidth,
 			1
 		);
 
@@ -51,6 +61,7 @@
 
 	if (heroArea && heroHeading && finePointer && !reduceMotion) {
 		heroArea.addEventListener("pointerenter", function (event) {
+			updateHeroMetrics();
 			updateHeroWidth(event.clientX);
 		});
 
@@ -61,6 +72,13 @@
 		heroArea.addEventListener("pointerleave", function () {
 			heroTarget = 100;
 			queueHeroWidth();
+		});
+
+		window.addEventListener("resize", function () {
+			// Update metrics if the user resizes while interacting
+			if (heroTarget !== 100) {
+				updateHeroMetrics();
+			}
 		});
 	}
 
