@@ -1,0 +1,3 @@
+## 2024-07-08 - Prevent layout thrashing on high-frequency pointer events
+**Learning:** Calling `getBoundingClientRect()` inside a rapidly firing `pointermove` event listener forces synchronous layout recalculations. When interleaved with style updates inside `requestAnimationFrame`, this causes layout thrashing, severely degrading rendering performance.
+**Action:** Always cache bounding client rects or dimensions outside of high-frequency event handlers. Initialize or update the cache on lower-frequency events like `pointerenter` and `resize`, and invalidate it on `pointerleave` or unmount.
