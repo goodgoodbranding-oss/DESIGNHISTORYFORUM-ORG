@@ -1,0 +1,3 @@
+## 2024-07-10 - Cache getBoundingClientRect() in pointermove
+**Learning:** Calling `getBoundingClientRect()` inside a high-frequency event listener like `pointermove` forces the browser to synchronously recalculate layout on every frame, leading to layout thrashing and poor animation performance (dropped frames).
+**Action:** Always cache the results of expensive DOM measurements like `getBoundingClientRect()` during a setup event (like `pointerenter`), and reuse the cached value in the high-frequency handler. Ensure to invalidate or update the cache when necessary (e.g., on `pointerleave` or `resize`).

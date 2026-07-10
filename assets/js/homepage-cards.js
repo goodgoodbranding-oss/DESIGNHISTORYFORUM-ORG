@@ -37,20 +37,26 @@
 		}
 	};
 
+	var cachedHeroRect = null;
+
 	var updateHeroWidth = function (clientX) {
-		var rect = heroArea.getBoundingClientRect();
-		var centerX = rect.left + rect.width / 2;
+		if (!cachedHeroRect) {
+			return;
+		}
+		var centerX = cachedHeroRect.left + cachedHeroRect.width / 2;
 		var distance = Math.min(
-			Math.abs(clientX - centerX) / (rect.width / 2 || 1),
+			Math.abs(clientX - centerX) / (cachedHeroRect.width / 2 || 1),
 			1
 		);
 
+		// ⚡ Bolt Optimization: Calculate distance using a cached bounding rectangle to avoid layout thrashing on pointermove.
 		heroTarget = 100 - distance * 18;
 		queueHeroWidth();
 	};
 
 	if (heroArea && heroHeading && finePointer && !reduceMotion) {
 		heroArea.addEventListener("pointerenter", function (event) {
+			cachedHeroRect = heroArea.getBoundingClientRect();
 			updateHeroWidth(event.clientX);
 		});
 
@@ -59,8 +65,16 @@
 		});
 
 		heroArea.addEventListener("pointerleave", function () {
+			cachedHeroRect = null;
 			heroTarget = 100;
 			queueHeroWidth();
+		});
+
+		// Update cached rect if window is resized while pointer is inside
+		window.addEventListener("resize", function () {
+			if (cachedHeroRect) {
+				cachedHeroRect = heroArea.getBoundingClientRect();
+			}
 		});
 	}
 
