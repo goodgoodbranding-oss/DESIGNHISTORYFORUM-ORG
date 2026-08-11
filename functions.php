@@ -116,8 +116,11 @@ function dhf_get_article_prompt_context( $post_id, $content ) {
 	$post_title = dhf_normalize_prompt_text( get_the_title( $post_id ) );
 	$post_url   = get_permalink( $post_id );
 	$site_name  = dhf_normalize_prompt_text( get_bloginfo( 'name' ) );
-	$categories = wp_get_post_terms( $post_id, 'category', array( 'fields' => 'names' ) );
-	$tags       = wp_get_post_terms( $post_id, 'post_tag', array( 'fields' => 'names' ) );
+	// Bolt optimization: Use get_the_terms() + wp_list_pluck() instead of wp_get_post_terms() to leverage object cache and prevent N+1 database queries.
+	$categories = get_the_terms( $post_id, 'category' );
+	$categories = ! empty( $categories ) && ! is_wp_error( $categories ) ? wp_list_pluck( $categories, 'name' ) : array();
+	$tags       = get_the_terms( $post_id, 'post_tag' );
+	$tags       = ! empty( $tags ) && ! is_wp_error( $tags ) ? wp_list_pluck( $tags, 'name' ) : array();
 	$lead       = has_excerpt( $post_id ) ? get_the_excerpt( $post_id ) : $content;
 	$lead       = wp_trim_words( dhf_normalize_prompt_text( $lead ), 55, '...' );
 	$body       = wp_trim_words( dhf_normalize_prompt_text( $content ), 220, '...' );
