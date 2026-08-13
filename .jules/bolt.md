@@ -1,0 +1,3 @@
+## 2024-08-13 - N+1 Queries and Broken Truncated Text
+**Learning:** `wp_get_post_terms` completely bypasses WordPress object cache, unlike `get_the_terms()`. In loops, this translates to severe N+1 database querying for taxonomies. Additionally, the custom `dhf_normalize_prompt_text` didn't remove shortcodes before applying `wp_strip_all_tags` and `wp_trim_words`, leading to broken fragments in excerpts.
+**Action:** Always prefer `get_the_terms()` over `wp_get_post_terms()` combined with `wp_list_pluck()` to prevent database thrashing in WordPress. Always run `strip_shortcodes()` before text truncation logic to maintain integrity.
