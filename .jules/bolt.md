@@ -1,0 +1,3 @@
+## 2024-08-12 - Optimize Taxonomy Queries and Text Normalization
+**Learning:** Using `wp_get_post_terms()` bypasses the object cache and results in N+1 query bottlenecks. Additionally, text normalization requires `strip_shortcodes()` before applying HTML conversions to prevent data malformation.
+**Action:** Always prefer `get_the_terms()` paired with `wp_list_pluck()` for retrieving taxonomy terms efficiently, and ensure shortcodes are stripped early in the text processing pipeline.
