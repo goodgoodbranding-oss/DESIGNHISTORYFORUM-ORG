@@ -71,7 +71,8 @@ add_action( 'wp_enqueue_scripts', 'dhf_kadence_child_enqueue_styles' );
  * @return string
  */
 function dhf_normalize_prompt_text( $text ) {
-	$text = html_entity_decode( wp_strip_all_tags( (string) $text ), ENT_QUOTES, get_bloginfo( 'charset' ) );
+	// Bolt optimization: strip shortcodes before tag stripping to prevent data malformation
+	$text = html_entity_decode( wp_strip_all_tags( strip_shortcodes( (string) $text ) ), ENT_QUOTES, get_bloginfo( 'charset' ) );
 	$text = preg_replace( '/\s+/u', ' ', trim( $text ) );
 
 	return is_string( $text ) ? $text : '';
@@ -116,8 +117,11 @@ function dhf_get_article_prompt_context( $post_id, $content ) {
 	$post_title = dhf_normalize_prompt_text( get_the_title( $post_id ) );
 	$post_url   = get_permalink( $post_id );
 	$site_name  = dhf_normalize_prompt_text( get_bloginfo( 'name' ) );
-	$categories = wp_get_post_terms( $post_id, 'category', array( 'fields' => 'names' ) );
-	$tags       = wp_get_post_terms( $post_id, 'post_tag', array( 'fields' => 'names' ) );
+	// Bolt optimization: Use get_the_terms to leverage object cache and prevent N+1 queries
+	$categories_objs = get_the_terms( $post_id, 'category' );
+	$categories      = $categories_objs && ! is_wp_error( $categories_objs ) ? wp_list_pluck( $categories_objs, 'name' ) : array();
+	$tags_objs       = get_the_terms( $post_id, 'post_tag' );
+	$tags            = $tags_objs && ! is_wp_error( $tags_objs ) ? wp_list_pluck( $tags_objs, 'name' ) : array();
 	$lead       = has_excerpt( $post_id ) ? get_the_excerpt( $post_id ) : $content;
 	$lead       = wp_trim_words( dhf_normalize_prompt_text( $lead ), 55, '...' );
 	$body       = wp_trim_words( dhf_normalize_prompt_text( $content ), 220, '...' );
