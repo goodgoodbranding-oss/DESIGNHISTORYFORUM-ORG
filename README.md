@@ -29,3 +29,10 @@ GitHub Actions jest zostawione tylko jako reczna alternatywa awaryjna przez `wor
 Folder `transport/` jest ignorowany przez git. Trzymamy tam screenshoty, plakaty, ZIP-y, eksporty robocze i materialy, ktore nie maja byc deployowane jako motyw.
 
 Pelna instrukcja pracy jest w `PROJECT-FLOW.md`.
+
+## Prywatność i zgody
+
+- [Projekt polityki prywatności PL](docs/privacy-policy.pl.md) — wymaga uzupełnienia administratora, retencji i dostawców przed publikacją.
+- [Zgoda przy pierwszej wizycie i geolokalizacja](docs/consent-and-geolocation.md) — wymagania wdrożenia, tekst panelu EN/PL i kryteria odbioru.
+
+Dokumentacja nie uruchamia zbierania danych ani panelu zgód.
